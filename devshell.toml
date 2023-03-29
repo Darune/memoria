@@ -1,0 +1,10 @@
+# https://numtide.github.io/devshell
+[[commands]]
+package = "nodejs"
+name = "node"
+help = "NodeJS"
+
+[[commands]]
+package = "yt-dlp"
+name = "yt-dlp"
+help = "youtube dl"
