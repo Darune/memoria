@@ -9,7 +9,7 @@ netlify
 .envrc
 
 # dependencies
-/node_modules
+node_modules
 
 # IDEs and editors
 /.idea
@@ -24,3 +24,7 @@ gitignore
 # System Files
 .DS_Store
 Thumbs.db
+
+
+# sample videos
+sample_videos

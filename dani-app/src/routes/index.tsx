@@ -1,4 +1,4 @@
-import Counter from "~/components/Counter";
+import { createServerData$ } from "solid-start/server";
 import "./index.css";
 
 export default function Home() {

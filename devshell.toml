@@ -8,3 +8,14 @@ help = "NodeJS"
 package = "yt-dlp"
 name = "yt-dlp"
 help = "youtube dl"
+
+[[commands]]
+package = "ffmpeg"
+name = "ffmpeg"
+help = "ffmpeg and ffprobe"
+
+[[commands]]
+package = "sqlite"
+name = "sqlite3"
+help = "sqlite"
+
