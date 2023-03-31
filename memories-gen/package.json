@@ -1,5 +1,5 @@
 {
-  "name": "dani-app",
+  "name": "mermories-gen",
   "scripts": {
     "dev": "solid-start dev",
     "build": "solid-start build",
