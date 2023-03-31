@@ -7,14 +7,14 @@ import { createServerData$ } from "solid-start/server";
 import ffprobe from "ffprobe";
 import which from "which";
 
-import { Video } from "~/data/model";
-import { replaceMovies } from "~/data/utils";
+import { Clip } from "~/data/model";
+import { replaceClips } from "~/data/utils";
 import settings from "~/settings";
 
 
 export function routeData() {
   return createServerData$(async () => {
-    const videoFiles: Video[] = [];
+    const clips: Clip[] = [];
     try {
       const files = await fs.promises.readdir(settings.VIDEO_FOLDER);
       for (const file of files) {
@@ -22,7 +22,7 @@ export function routeData() {
         const probe = await ffprobe(
           filePath, { path: await which('ffprobe') }
         );
-        videoFiles.push({
+        clips.push({
           name: file,
           duration: parseFloat(probe.streams[0].duration),
           path: filePath,
@@ -31,16 +31,16 @@ export function routeData() {
     } catch (err) {
       console.error(err);
     }
-    replaceMovies(videoFiles);
-    return videoFiles;
+    replaceClips(clips);
+    return clips;
   });
 }
 
-export default function RefreshVideoView() {
-  const myVideos = useRouteData<typeof routeData>();
+export default function RefreshClipsView() {
+  const clips = useRouteData<typeof routeData>();
   return (
     <ul>
-      <For each={myVideos()}>{(video) => <li>{video.name} - {video.duration}</li>}</For>
+      <For each={clips()}>{(clip) => <li>{clip.name} - {clip.duration}</li>}</For>
     </ul>
   );
 }
