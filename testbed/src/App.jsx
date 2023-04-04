@@ -5,42 +5,29 @@ import { createSignal, createEffect, onMount  } from 'solid-js';
 import gangman from './assets/gangnam.mp4';
 import bigbuck from './assets/bigbuck.mp4';
 
-var combineDecription = {
+var combineDecription ={
   title:"Combine",
   description: "A basic effect which renders the input to the output, Typically used as a combine node for layering up media with alpha transparency.",
   vertexShader : `
-      attribute vec2 a_position;
-      attribute vec2 a_texCoord;
-      varying vec2 v_texCoord;
-      void main() {
-          gl_Position = vec4(vec2(2.0,2.0)*a_position-vec2(1.0, 1.0), 0.0, 1.0);
-          v_texCoord = a_texCoord;
-      }`,
+    attribute vec2 a_position;
+    attribute vec2 a_texCoord;
+    varying vec2 v_texCoord;
+    void main() {
+      gl_Position = vec4(vec2(2.0,2.0)*a_position-vec2(1.0, 1.0), 0.0, 1.0);
+      v_texCoord = a_texCoord;
+    }`,
   fragmentShader : `
-      precision mediump float;
-      uniform sampler2D u_image_a;
-      uniform sampler2D u_image_b;
-      varying vec2 v_texCoord;
-      uniform float mix;
-      varying float v_mix;
-      varying float v_progress;
-      void main(){
-          if (v_texCoord[0] >= 0.5) {
-            vec2 pos = vec2(v_texCoord[0]*1.0/0.5 - (1.0/0.5/2.0), v_texCoord[1]*1.0/1.0 - (1.0/1.0/2.0-0.5));
-            vec4 color = texture2D(u_image_b, pos);
-            color.a = 0.8;
-            gl_FragColor = color;
-          } else {
-            vec2 pos = vec2(v_texCoord[0]*1.0/0.5 - (1.0/0.5/2.0-1.0), v_texCoord[1]*1.0/1.0 - (1.0/1.0/2.0-0.5));
-            vec4 color = texture2D(u_image_a, pos);
-            color.a = mix;
-            gl_FragColor = color;
-          }
-      }`,
+    precision mediump float;
+    uniform sampler2D u_image;
+    varying vec2 v_texCoord;
+    varying float v_mix;
+    void main(){
+      vec4 color = texture2D(u_image, v_texCoord);
+      gl_FragColor = color;
+    }`,
   properties:{
-    mix: { type: "uniform", value: 0.0 }
   },
-  inputs:["u_image_a", "u_image_b", "v_mix"]
+  inputs:["u_image"]
 };
 
 function App() {

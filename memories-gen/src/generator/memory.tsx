@@ -12,7 +12,10 @@ export default function generate(
   while (memory.duration < (expectedDurationS - 5)) {
     const randomClipIdx = getRandomInt(availableClips.length);
     const clip = availableClips[randomClipIdx];
-    const clipStart = getRandomInt(Math.floor(clip.duration) - MAX_DURATION_PER_CLIP_SECONDS);
+    const nbBucket = Math.floor(clip.duration / 7);
+    const clipStart = getRandomInt(
+      (Math.floor(clip.duration) - MAX_DURATION_PER_CLIP_SECONDS) / nbBucket
+    ) * (clip.duration / nbBucket);
     const clipStop = clipStart + (
       MIN_DURATION_PER_CLIP_SECONDS + Math.min(
         getRandomInt(DURATION_DIFF)
@@ -21,7 +24,10 @@ export default function generate(
     const memoryClip = new MemoryClip(
       clip, clipStart, clipStop
     );
-    memory.pushClip(memoryClip);
+    if (memory.canAdd(memoryClip)) {
+      memory.pushClip(memoryClip);
+    }
+
   }
   return memory;
 }

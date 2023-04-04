@@ -64,6 +64,17 @@ export class Memory implements MemoryType {
     this.clips.push(memoryClip)
     this.duration += memoryClip.duration;
   }
+
+  canAdd(memoryClip: MemoryClip) {
+    for (const clip of this.clips) {
+      if (clip.name == memoryClip.name) {
+        if (Math.abs(clip.start - memoryClip.start) < clip.duration) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
   summarize() : Array<string> {
     const result = new Array<string>();
     for (const clip of this.clips) {
