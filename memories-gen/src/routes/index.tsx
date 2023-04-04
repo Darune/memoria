@@ -1,18 +1,16 @@
-import { createServerData$ } from "solid-start/server";
+import { A } from 'solid-start';
 import "./index.css";
 
 export default function Home() {
   return (
     <main>
-      <h1>Hello world!</h1>
-      <Counter />
-      <p>
-        Visit{" "}
-        <a href="https://solidjs.com" target="_blank">
-          solidjs.com
-        </a>{" "}
-        to learn how to build Solid apps.
-      </p>
+      <div>
+        <A href="/create"> Create </A>
+      </div>
+      <div>
+        <A href="/refresh"> refresh video </A>
+      </div>
+      to learn how to build Solid apps.
     </main>
   );
 }

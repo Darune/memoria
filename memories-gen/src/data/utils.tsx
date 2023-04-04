@@ -41,12 +41,35 @@ export function getClipFilePath(videoName: string) : Promise<Clip> {
   const db = getDatabase();
   const sql = "SELECT * FROM AvailableClips WHERE name == ?";
   return new Promise((resolve, reject) => {
-    db.get(sql, [videoName], (err, row) => {
+    db.get(sql, [videoName], (err, row: {name: string, duration: number, path: string}) => {
       if (err) {
         reject(err);
       }
-      resolve(row as Clip);
+      resolve(new Clip(row.name, row.duration, row.path));
     });
     db.close();
   });
+}
+
+export function getAllClips() : Promise<Array<Clip>> {
+  const db = getDatabase();
+  const sql = "SELECT * FROM AvailableClips";
+  return new Promise((resolve, reject) => {
+    db.all(sql, (err, rows: Array<{name: string, duration: number, path: string}>) => {
+      if (err) {
+        reject(err);
+      }
+      const clips = new Array<Clip>()
+      for (const row of rows) {
+        clips.push(new Clip(row.name, row.duration, row.path))
+      }
+      resolve(clips);
+    });
+    db.close();
+  });
+}
+
+
+export function getRandomInt(max: number) : number {
+  return Math.floor(Math.random() * max);
 }

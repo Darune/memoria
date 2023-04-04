@@ -11,6 +11,7 @@ import {
   Title,
 } from "solid-start";
 import { ErrorBoundary } from "solid-start/error-boundary";
+import { HydrationScript } from "solid-js/web";
 
 export default function Root() {
   return (
@@ -19,6 +20,7 @@ export default function Root() {
         <Title>SolidStart - With Vitest</Title>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
+        <HydrationScript />
       </Head>
       <Body>
         <Suspense>
