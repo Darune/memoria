@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onMount } from "solid-js";
-import { Memory } from "~/data/model";
+import { Memory, MemoryType } from "~/data/model";
 import VideoContext from 'videocontext';
 
 var combineDecription ={
@@ -27,9 +27,8 @@ var combineDecription ={
   inputs:["u_image"]
 };
 
-export default function MemoryPlayer(props) {
+export default function MemoryPlayer(props: {memory: MemoryType}) {
   onMount(() => {
-    console.log('onMount');
     const canvasRef = document.getElementById('video-canvas');
     const videoContext = new VideoContext(canvasRef);
     const videoNodes = []

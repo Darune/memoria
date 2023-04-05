@@ -1,5 +1,4 @@
 import fs from "fs";
-import { join } from "path";
 
 import { For } from "solid-js";
 import { useRouteData, createRouteData } from "solid-start";
@@ -13,26 +12,9 @@ import settings from "~/settings";
 
 
 export function routeData() {
-  return createServerData$(async () => {
-    const clips: Clip[] = [];
-    try {
-      const files = await fs.promises.readdir(settings.VIDEO_FOLDER);
-      for (const file of files) {
-        const filePath = join(settings.VIDEO_FOLDER, file);
-        const probe = await ffprobe(
-          filePath, { path: await which('ffprobe') }
-        );
-        clips.push({
-          name: file,
-          duration: parseFloat(probe.streams[0].duration),
-          path: filePath,
-        });
-      };
-    } catch (err) {
-      console.error(err);
-    }
-    replaceClips(clips);
-    return clips;
+  return createRouteData(async () => {
+    const response = await fetch('/api/clips/refresh')
+    return response.json();
   });
 }
 

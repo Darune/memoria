@@ -1,9 +1,10 @@
 import { createSignal, onMount, Show } from "solid-js";
 import { unstable_clientOnly } from "solid-start";
+import { MemoryType } from "~/data/model";
 
 let VideoPlayer = unstable_clientOnly(() => import("~/components/video-player/memory"));
 
-export default function ClientVideoPlayer(props) {
+export default function ClientVideoPlayer(props: { memory: MemoryType }) {
   const [ isClientSide, setIsClientSide ] = createSignal(false);
   onMount(() => {
     setIsClientSide(true);

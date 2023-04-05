@@ -4,6 +4,7 @@ import { MAX_DURATION_PER_CLIP_SECONDS, MIN_DURATION_PER_CLIP_SECONDS, EXPECTED_
 
 
 const DURATION_DIFF = MAX_DURATION_PER_CLIP_SECONDS - MIN_DURATION_PER_CLIP_SECONDS
+
 export default function generate(
   availableClips: Array<Clip>, expectedDurationS: number = EXPECTED_MEMORY_DURATION,
 ): Memory {
@@ -13,12 +14,13 @@ export default function generate(
     const randomClipIdx = getRandomInt(availableClips.length);
     const clip = availableClips[randomClipIdx];
     const nbBucket = Math.floor(clip.duration / 7);
-    const clipStart = getRandomInt(
-      (Math.floor(clip.duration) - MAX_DURATION_PER_CLIP_SECONDS) / nbBucket
-    ) * (clip.duration / nbBucket);
+    const clipStart = Math.round(getRandomInt(
+      (Math.floor(clip.duration) - MIN_DURATION_PER_CLIP_SECONDS) / nbBucket
+    ) * (clip.duration / nbBucket));
     const clipStop = clipStart + (
       MIN_DURATION_PER_CLIP_SECONDS + Math.min(
-        getRandomInt(DURATION_DIFF)
+        getRandomInt(DURATION_DIFF),
+        clip.duration - MIN_DURATION_PER_CLIP_SECONDS
       )
     );
     const memoryClip = new MemoryClip(
