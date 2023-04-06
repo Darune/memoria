@@ -8,13 +8,10 @@ export default function ClientVideoPlayer(props: { memory: MemoryType }) {
   const [ isClientSide, setIsClientSide ] = createSignal(false);
   onMount(() => {
     setIsClientSide(true);
-    console.log('client side video');
   })
-  console.log('dfjsljflsdf');
   return (
     <Show when={isClientSide()}>
       {() => {
-        console.log('props: ', props);
         return (<VideoPlayer {...props} />);
       }}
     </Show>

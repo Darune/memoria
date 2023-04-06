@@ -26,9 +26,9 @@ export default function generate(
     const memoryClip = new MemoryClip(
       clip, clipStart, clipStop
     );
-    if (memory.canAdd(memoryClip)) {
-      memory.pushClip(memoryClip);
-    }
+    // if (memory.canAdd(memoryClip)) {
+    memory.pushClip(memoryClip);
+    // }
 
   }
   return memory;
