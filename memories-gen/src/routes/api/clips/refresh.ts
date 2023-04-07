@@ -22,7 +22,7 @@ export async function GET({ params }: APIEvent) {
       );
       clips.push({
         name: file,
-        duration: parseFloat(probe.streams[0].duration),
+        duration: probe.streams[0].duration || 0,
         path: filePath,
       });
     };

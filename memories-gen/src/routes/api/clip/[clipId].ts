@@ -1,6 +1,6 @@
-import { APIEvent, json } from "solid-start/api";
+import { APIEvent } from "solid-start/api";
 import { getClipFilePath  } from "~/data/utils";
-import { pipeline } from 'stream';
+
 import { promisify } from 'util';
 import fs from 'fs';
 const fileInfo = promisify(fs.stat)
@@ -29,6 +29,7 @@ export async function GET({ request, params }: APIEvent) {
     // Handle unavailable range request
     if (start >= clipSize || end >= clipSize) {
       // Return the 416 Range Not Satisfiable.
+      new Response()
       return new Response("", {
         headers: {
           "Content-Range": `bytes */${clipSize}`
@@ -62,24 +63,4 @@ export async function GET({ request, params }: APIEvent) {
       },
     );
   }
-  //   res.writeHead(200, {
-  //     "Content-Length": clipSize,
-  //     "Content-Type": "video/mp4"
-  //   });
-
-  //   let readable = fs.createReadStream(clip.path);
-  //   pipeline(readable, res, err => {
-  //     console.log(err);
-  //   });
-
-  // }
-  // return res;
-  // const readableStream = fs.createReadStream(clip.path);
-  // return new Response(
-  //   readableStream, {
-  //     headers: {
-  //       "Content-Type": "video/mp4",
-  //       'Transfer-Encoding': null
-  //     },
-  //   });
 }

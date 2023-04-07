@@ -14,6 +14,14 @@ export interface MemoryClipType {
   stop: number;
   duration: number;
   clip: ClipType;
+  transition?: MemoryClipTransitionType;
+}
+
+export interface MemoryClipTransitionType {
+  type: string;
+  start: number;
+  stop: number;
+  duration: number;
 }
 
 export interface MemoryType {
@@ -40,14 +48,20 @@ export class MemoryClip implements MemoryClipType {
   stop: number;
   duration: number;
   clip: ClipType;
+  transition?: MemoryClipTransitionType;
 
-  constructor(clip: Clip, start: number, stop: number) {
+  constructor(
+    clip: Clip, start: number, stop: number
+  ) {
     this.name = clip.name;
     this.start = start;
     this.stop = stop;
     this.duration = stop - start;
     this.clip = clip;
     this.uid = `${this.name}:${this.start}:${this.stop}`;
+  }
+  addTransition(transition?: MemoryClipTransitionType) {
+    this.transition = transition
   }
 }
 
@@ -63,6 +77,9 @@ export class Memory implements MemoryType {
   pushClip(memoryClip: MemoryClip) {
     this.clips.push(memoryClip)
     this.duration += memoryClip.duration;
+    // if (memoryClip.transition) {
+    //   this.duration -= memoryClip.transition.duration / 2;
+    // }
   }
 
   canAdd(memoryClip: MemoryClip) {

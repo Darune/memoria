@@ -1,5 +1,0 @@
-
-export const MAX_DURATION_PER_CLIP_SECONDS = 23;
-export const MIN_DURATION_PER_CLIP_SECONDS = 10;
-
-export const EXPECTED_MEMORY_DURATION = 60;
