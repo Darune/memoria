@@ -44,6 +44,7 @@ export default function generate(
 ): Memory {
 
   const memory = new Memory();
+  let previousClip = null;
   while (!isOver(memory.duration, expectedDurationS)) {
     const randomClipIdx = getRandomInt(availableClips.length);
     const clip = availableClips[randomClipIdx];
@@ -58,11 +59,14 @@ export default function generate(
     );
     const memoryClip = new MemoryClip(clip, clipStart, clipStop);
     const endClipDuration = memory.duration + memoryClip.duration
-    let possibleTransition = tryFindTransition(endClipDuration)
-    if (!isOver(endClipDuration, expectedDurationS)) {
-      memoryClip.addTransition(possibleTransition)
-    }
     if (memory.canAdd(memoryClip)) {
+      if (!previousClip || !previousClip.transition) {
+        let possibleTransition = tryFindTransition(endClipDuration)
+        if (!isOver(endClipDuration, expectedDurationS)) {
+          memoryClip.addTransition(possibleTransition)
+        }
+      }
+      previousClip = memoryClip
       memory.pushClip(memoryClip);
     }
   }
