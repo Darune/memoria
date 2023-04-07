@@ -7,7 +7,7 @@ export const EXPECTED_MEMORY_DURATION = 60;
 // 0 to 1 probability
 export const PROBA_TRY_TRANSITION = 0.3;
 export const PROBA_CROSS_FADE = 0.2;
-
+export const PROBA_HORIZONTAL_BLUR = 0.001;
 
 export const AVAILABLE_TRANSITIONS = [
   {
@@ -15,6 +15,12 @@ export const AVAILABLE_TRANSITIONS = [
     'minDuration': 2,
     'maxDuration': 5,
     'proba': PROBA_CROSS_FADE,
+  },
+  {
+    'type': 'horizontal_wipe',
+    'minDuration': 1,
+    'maxDuration': 3,
+    'proba': PROBA_HORIZONTAL_BLUR,
   }
 ];
 

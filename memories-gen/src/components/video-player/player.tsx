@@ -55,7 +55,6 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}
     let currentDuration = 0;
     const combineEffect = Combine(videoContext);
     let inTransition = null;
-    let inTransitionDefinition = null;
     for (const clip of props.memory.clips) {
       const videoNode = videoContext.video(`/api/clip/${clip.name}`, clip.start);
       videoNode.startAt(currentDuration);
@@ -64,7 +63,6 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}
         videoNode.connect(inTransition);
         inTransition.connect(combineEffect);
         inTransition = null;
-        inTransitionDefinition = null;
       } else if (!clip.transition) {
         videoNode.startAt(currentDuration);
         videoNode.stopAt(currentDuration + clip.duration);
@@ -72,9 +70,9 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}
         videoNodes[idx] = videoNode;
       }
       if (clip.transition) {
-        inTransitionDefinition = clip.transition
+        const inTransitionDefinition = clip.transition
         inTransition = getTransitionNode(videoContext, inTransitionDefinition);
-        // currentDuration -= inTransitionDefinition.duration / 4;
+        currentDuration -= inTransitionDefinition.duration;
         videoNode.connect(inTransition);
         videoNode[idx] = inTransition;
       }

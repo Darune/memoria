@@ -19,7 +19,7 @@ function tryFindTransition(currentDuration: number) : MemoryClipTransitionType |
     for (const transition of genSettings.AVAILABLE_TRANSITIONS) {
       if (isRandomlyElected(transition.proba)) {
         let duration = transition.minDuration + getRandomInt(transition.maxDuration - transition.minDuration);
-        let start = currentDuration - duration / 2;
+        let start = currentDuration - duration;
         if (start < 0) {
           start = 0;
           duration *= 2;  // cancel out the / 2 in this case (start transition)
@@ -27,7 +27,7 @@ function tryFindTransition(currentDuration: number) : MemoryClipTransitionType |
         return {
           type: transition.type,
           start: start,
-          stop: currentDuration + duration / 2,
+          stop: currentDuration,
           duration: duration,
         } as MemoryClipTransitionType
       }
