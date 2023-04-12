@@ -1,6 +1,6 @@
-import { Clip, MemoryClip, Memory, MemoryClipTransitionType } from "~/data/model";
+import { Clip, MemoryClip, Memory, MemoryClipTransitionType, EffectType } from "~/data/model";
 import { getRandomInt } from '~/data/utils';
-import  genSettings from "./settings";
+import  genSettings, { AVAILABLE_FADE_INS, AVAILABLE_FADE_OUTS } from "./generation-settings";
 
 
 const DURATION_DIFF = genSettings.MAX_DURATION_PER_CLIP_SECONDS - genSettings.MIN_DURATION_PER_CLIP_SECONDS
@@ -30,6 +30,29 @@ function tryFindTransition(currentDuration: number) : MemoryClipTransitionType |
           stop: currentDuration,
           duration: duration,
         } as MemoryClipTransitionType
+      }
+    }
+  }
+}
+
+function tryFindFade(
+  currentDuration: number, fade_proba: number, fades
+) : EffectType | undefined {
+  if (isRandomlyElected(fade_proba)) {
+    for (const fade of fades) {
+      if (isRandomlyElected(fade.proba)) {
+        let duration = fade.minDuration + getRandomInt(fade.maxDuration - fade.minDuration);
+        let start = currentDuration - duration;
+        if (currentDuration == 0) {
+          start = 0;
+        }
+        let stop = start + duration;
+        return {
+          type: fade.type,
+          start,
+          stop,
+          duration
+        } as EffectType
       }
     }
   }
@@ -69,6 +92,10 @@ export default function generate(
       previousClip = memoryClip
       memory.pushClip(memoryClip);
     }
+    const fadeIn = tryFindFade(0, genSettings.PROBA_MEMORY_FADE_IN, AVAILABLE_FADE_INS)
+    const fadeOut = tryFindFade(memory.duration, genSettings.PROBA_MEMORY_FADE_OUT, AVAILABLE_FADE_OUTS)
+    memory.setFadeIn(fadeIn);
+    memory.setFadeOut(fadeOut)
   }
   return memory;
 }

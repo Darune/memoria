@@ -1,8 +1,9 @@
-import { createEffect, createSignal, onMount, Show } from "solid-js";
-import { Memory, MemoryType } from "~/data/model";
+import { onMount, Show } from "solid-js";
+import { MemoryType } from "~/data/model";
 import VideoContext from 'videocontext';
 import { Combine } from "./compositor/combine";
 import getTransitionNode from "./transitions";
+import getEffectNode from "./effects";
 
 
 function InitVisualisations(videoCtx, graphCanvasID, visualisationCanvasID){
@@ -53,7 +54,7 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}
     const videoNodes = []
     let idx = 0 ;
     let currentDuration = 0;
-    const combineEffect = Combine(videoContext);
+    let globalOutput = Combine(videoContext);
     let inTransition = null;
     for (const clip of props.memory.clips) {
       const videoNode = videoContext.video(`/api/clip/${clip.name}`, clip.start);
@@ -61,12 +62,12 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}
       videoNode.stopAt(currentDuration + clip.duration);
       if (inTransition) {
         videoNode.connect(inTransition);
-        inTransition.connect(combineEffect);
+        inTransition.connect(globalOutput);
         inTransition = null;
       } else if (!clip.transition) {
         videoNode.startAt(currentDuration);
         videoNode.stopAt(currentDuration + clip.duration);
-        videoNode.connect(combineEffect);
+        videoNode.connect(globalOutput);
         videoNodes[idx] = videoNode;
       }
       if (clip.transition) {
@@ -79,7 +80,18 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}
       idx += 1;
       currentDuration += clip.duration;
     }
-    combineEffect.connect(videoContext.destination);
+    if (props.memory.fadeIn) {
+      const fadeInEffect = getEffectNode(videoContext, props.memory.fadeIn);
+      globalOutput.connect(fadeInEffect);
+      globalOutput = fadeInEffect;
+    }
+    if (props.memory.fadeOut) {
+      const fadeOutEffect = getEffectNode(videoContext, props.memory.fadeOut);
+      globalOutput.connect(fadeOutEffect);
+      globalOutput = fadeOutEffect;
+    }
+
+    globalOutput.connect(videoContext.destination);
     videoContext.play();
     if (props.debug) {
       InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');

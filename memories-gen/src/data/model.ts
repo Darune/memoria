@@ -24,9 +24,18 @@ export interface MemoryClipTransitionType {
   duration: number;
 }
 
+export interface EffectType {
+  type: string;
+  duration: number;
+  start: number;
+  stop: number;
+}
+
 export interface MemoryType {
   clips: Array<MemoryClipType>;
   duration: number;
+  fadeIn?: EffectType;
+  fadeOut?: EffectType;
 }
 
 
@@ -60,6 +69,7 @@ export class MemoryClip implements MemoryClipType {
     this.clip = clip;
     this.uid = `${this.name}:${this.start}:${this.stop}`;
   }
+
   addTransition(transition?: MemoryClipTransitionType) {
     this.transition = transition
   }
@@ -68,6 +78,8 @@ export class MemoryClip implements MemoryClipType {
 export class Memory implements MemoryType {
   clips: Array<MemoryClipType>;
   duration: number;
+  fadeIn?: EffectType;
+  fadeOut?: EffectType;
 
   constructor() {
     this.clips = new Array<MemoryClip>();
@@ -76,10 +88,11 @@ export class Memory implements MemoryType {
 
   pushClip(memoryClip: MemoryClip) {
     this.clips.push(memoryClip)
-    this.duration += memoryClip.duration;
-    // if (memoryClip.transition) {
-    //   this.duration -= memoryClip.transition.duration / 2;
-    // }
+    if (memoryClip.transition) {
+      this.duration += memoryClip.duration - memoryClip.transition.duration;
+    } else {
+      this.duration += memoryClip.duration;
+    }
   }
 
   canAdd(memoryClip: MemoryClip) {
@@ -92,11 +105,20 @@ export class Memory implements MemoryType {
     }
     return true;
   }
+
   summarize() : Array<string> {
     const result = new Array<string>();
     for (const clip of this.clips) {
       result.push(`${clip.uid}`)
     }
     return result;
+  }
+
+  setFadeIn(fadeIn?: EffectType) {
+    this.fadeIn = fadeIn;
+  }
+
+  setFadeOut(fadeOut?: EffectType) {
+    this.fadeOut = fadeOut;
   }
 };

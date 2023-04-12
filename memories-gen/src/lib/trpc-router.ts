@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server';
 import { getAllClips } from "~/data/utils";
-import generate from "~/generator/memory";
+import generate from "~/generator/generate";
 
 const t = initTRPC.create();
 

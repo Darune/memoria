@@ -1,6 +1,7 @@
 import crossFade from './crossfade';
 import horizontalBlur from './horizontalblur';
 import VideoContext from 'videocontext';
+import { MemoryClipTransitionType } from '~/data/model';
 
 function basicTransition(definition) {
   return (videoContext, start, stop) => {
@@ -14,7 +15,7 @@ const transitions = {
   'to_color_and_back': basicTransition(VideoContext.DEFINITIONS.TO_COLOR_AND_BACK),
 }
 
-export default function getTransitionNode(videoContext, transitionDefinition) {
+export default function getTransitionNode(videoContext, transitionDefinition: MemoryClipTransitionType) {
   const transition = transitions[transitionDefinition.type];
   if (!transition) {
     return;
