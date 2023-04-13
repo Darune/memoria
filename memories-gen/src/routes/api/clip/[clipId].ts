@@ -32,7 +32,7 @@ export async function GET({ request, params }: APIEvent) {
       new Response()
       return new Response("", {
         headers: {
-          "Content-Range": `bytes */${clipSize}`
+          "Content-Range": `bytes */${clipSize - 1}`
         },
         status: 416
       } )
@@ -42,7 +42,7 @@ export async function GET({ request, params }: APIEvent) {
     return new Response(
       readable, {
         headers: {
-          "Content-Range": `bytes ${start}-${end}/${clipSize}`,
+          "Content-Range": `bytes ${start}-${end}/${clipSize - 1}`,
           "Accept-Ranges": "bytes",
           "Content-Length": end - start + 1,
           "Content-Type": "video/mp4"
@@ -57,7 +57,7 @@ export async function GET({ request, params }: APIEvent) {
         headers: {
           "Content-Length": clipSize,
           "Content-Type": "video/mp4",
-          "Content-Range": `bytes 0-${clipSize-1}/${clipSize}`,
+          "Content-Range": `bytes 0-${clipSize-1}/${clipSize - 1}`,
         },
         status: 206,
       },

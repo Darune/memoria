@@ -23,9 +23,9 @@ export const AVAILABLE_TRANSITIONS = [
   }
 ];
 
-export const PROBA_MEMORY_FADE_IN = 0.5;
-export const PROBA_MEMORY_FADE_OUT = 0.5;
-export const PROBA_FADE_FLASH_TO_NORM = 0.3
+export const PROBA_MEMORY_FADE_IN = 0.7;
+export const PROBA_MEMORY_FADE_OUT = 0.7;
+export const PROBA_FADE_FLASH_TO_NORM = 0.4
 export const PROBA_FADE_NORM_TO_FLASH = 0.1
 export const PROBA_FADE_BLACK_TO_NORM = 0.4
 export const PROBA_FADE_NORM_TO_BLACK = 0.1

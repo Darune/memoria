@@ -47,50 +47,55 @@ function RefreshGraph(videoCtx, graphCanvasID){
 }
 
 
+function buildPlaybackGraph(videoContext, memory: MemoryType) {
+  const videoNodes = []
+  let idx = 0 ;
+  let currentDuration = 0;
+  let globalOutput = Combine(videoContext);
+  let inTransition = null;
+  for (const clip of memory.clips) {
+    const videoNode = videoContext.video(clip.clip.url, clip.start);
+    videoNode.startAt(currentDuration);
+    videoNode.stopAt(currentDuration + clip.duration);
+    if (inTransition) {
+      videoNode.connect(inTransition);
+      inTransition.connect(globalOutput);
+      inTransition = null;
+    } else if (!clip.transition) {
+      videoNode.startAt(currentDuration);
+      videoNode.stopAt(currentDuration + clip.duration);
+      videoNode.connect(globalOutput);
+      videoNodes[idx] = videoNode;
+    }
+    if (clip.transition) {
+      const inTransitionDefinition = clip.transition
+      inTransition = getTransitionNode(videoContext, inTransitionDefinition);
+      currentDuration -= inTransitionDefinition.duration;
+      videoNode.connect(inTransition);
+      videoNode[idx] = inTransition;
+    }
+    idx += 1;
+    currentDuration += clip.duration;
+  }
+  if (memory.fadeIn) {
+    const fadeInEffect = getEffectNode(videoContext, memory.fadeIn);
+    globalOutput.connect(fadeInEffect);
+    globalOutput = fadeInEffect;
+  }
+  if (memory.fadeOut) {
+    const fadeOutEffect = getEffectNode(videoContext, memory.fadeOut);
+    globalOutput.connect(fadeOutEffect);
+    globalOutput = fadeOutEffect;
+  }
+  return globalOutput;
+}
+
 export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}) {
   onMount(() => {
     const canvasRef = document.getElementById('video-canvas');
     const videoContext = new VideoContext(canvasRef);
-    const videoNodes = []
-    let idx = 0 ;
-    let currentDuration = 0;
-    let globalOutput = Combine(videoContext);
-    let inTransition = null;
-    for (const clip of props.memory.clips) {
-      const videoNode = videoContext.video(`/api/clip/${clip.name}`, clip.start);
-      videoNode.startAt(currentDuration);
-      videoNode.stopAt(currentDuration + clip.duration);
-      if (inTransition) {
-        videoNode.connect(inTransition);
-        inTransition.connect(globalOutput);
-        inTransition = null;
-      } else if (!clip.transition) {
-        videoNode.startAt(currentDuration);
-        videoNode.stopAt(currentDuration + clip.duration);
-        videoNode.connect(globalOutput);
-        videoNodes[idx] = videoNode;
-      }
-      if (clip.transition) {
-        const inTransitionDefinition = clip.transition
-        inTransition = getTransitionNode(videoContext, inTransitionDefinition);
-        currentDuration -= inTransitionDefinition.duration;
-        videoNode.connect(inTransition);
-        videoNode[idx] = inTransition;
-      }
-      idx += 1;
-      currentDuration += clip.duration;
-    }
-    if (props.memory.fadeIn) {
-      const fadeInEffect = getEffectNode(videoContext, props.memory.fadeIn);
-      globalOutput.connect(fadeInEffect);
-      globalOutput = fadeInEffect;
-    }
-    if (props.memory.fadeOut) {
-      const fadeOutEffect = getEffectNode(videoContext, props.memory.fadeOut);
-      globalOutput.connect(fadeOutEffect);
-      globalOutput = fadeOutEffect;
-    }
 
+    const globalOutput = buildPlaybackGraph(videoContext, props.memory);
     globalOutput.connect(videoContext.destination);
     videoContext.play();
     if (props.debug) {

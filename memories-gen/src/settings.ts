@@ -9,4 +9,5 @@ export default {
     REPO_ROJECT_DIR: REPO_ROJECT_DIR,
     APP_ROJECT_DIR: APP_ROJECT_DIR,
     VIDEO_FOLDER: process.env.VIDEO_FOLDER || join(REPO_ROJECT_DIR, 'sample_videos'),
+    MUSIC_FOLDER: process.env.MUSIC_FOLDER || join(REPO_ROJECT_DIR, 'sample_musics'),
 }

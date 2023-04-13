@@ -1,4 +1,6 @@
-import { Clip, MemoryClip, Memory, MemoryClipTransitionType, EffectType } from "~/data/model";
+import {
+  Clip, MemoryClip, Memory, MemoryClipTransitionType, EffectType, Audio
+} from "~/data/model";
 import { getRandomInt } from '~/data/utils';
 import  genSettings, { AVAILABLE_FADE_INS, AVAILABLE_FADE_OUTS } from "./generation-settings";
 
@@ -63,7 +65,8 @@ function isOver(currentDuration: number, expectedDurationS: number) {
 }
 
 export default function generate(
-  availableClips: Array<Clip>, expectedDurationS: number = genSettings.EXPECTED_MEMORY_DURATION,
+  availableClips: Array<Clip>, availableMusics: Array<Audio>,
+  expectedDurationS: number = genSettings.EXPECTED_MEMORY_DURATION,
 ): Memory {
 
   const memory = new Memory();
@@ -97,5 +100,9 @@ export default function generate(
     memory.setFadeIn(fadeIn);
     memory.setFadeOut(fadeOut)
   }
+  const audioIdx = getRandomInt(availableMusics.length);
+  console.log(audioIdx, availableMusics);
+  console.log(availableMusics[audioIdx])
+  memory.setAudio(availableMusics[audioIdx]);
   return memory;
 }

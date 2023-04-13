@@ -4,6 +4,7 @@ export interface ClipType {
   name: string;
   duration: number;
   path?: string;
+  url: string;
 }
 
 
@@ -31,11 +32,18 @@ export interface EffectType {
   stop: number;
 }
 
+export interface AudioType {
+  name: string;
+  path: string;
+  url: string;
+}
+
 export interface MemoryType {
   clips: Array<MemoryClipType>;
   duration: number;
   fadeIn?: EffectType;
   fadeOut?: EffectType;
+  audio?: AudioType;
 }
 
 
@@ -43,11 +51,13 @@ export class Clip implements ClipType {
   name: string;
   duration: number;
   path: string;
+  url: string;
 
-  constructor(name: string, duration: number, path: string) {
+  constructor(name: string, duration: number, path: string, url: string) {
     this.name = name;
     this.duration = duration;
     this.path = path;
+    this.url = url;
   }
 }
 export class MemoryClip implements MemoryClipType {
@@ -80,6 +90,7 @@ export class Memory implements MemoryType {
   duration: number;
   fadeIn?: EffectType;
   fadeOut?: EffectType;
+  audio?: AudioType;
 
   constructor() {
     this.clips = new Array<MemoryClip>();
@@ -121,4 +132,21 @@ export class Memory implements MemoryType {
   setFadeOut(fadeOut?: EffectType) {
     this.fadeOut = fadeOut;
   }
+
+  setAudio(audio: AudioType) {
+    this.audio = audio;
+  }
 };
+
+
+export class Audio implements AudioType {
+  name: string;
+  path: string;
+  url: string;
+
+  constructor(name: string, path: string) {
+    this.name = name;
+    this.path = path;
+    this.url = 'test';
+  }
+}

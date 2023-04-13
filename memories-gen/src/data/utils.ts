@@ -1,7 +1,7 @@
 import sqlite3 from "sqlite3";
 import settings from "~/settings";
 import { join } from "path";
-import { Clip } from "./model";
+import { Clip, Audio } from "./model";
 
 
 export function getDatabase() {
@@ -16,7 +16,13 @@ export function getDatabase() {
   db.run(
     'CREATE TABLE IF NOT EXISTS AvailableClips(name TEXT, duration REAL, path TEXT);',
     (err) => {if (err) { console.log(err);}}
-      );
+  );
+
+  db.run(
+    'CREATE TABLE IF NOT EXISTS AvailableSounds(name TEXT, path TEXT);',
+    (err) => {if (err) { console.log(err);}}
+  );
+
   return db
 }
 
@@ -61,7 +67,7 @@ export function getAllClips() : Promise<Array<Clip>> {
       }
       const clips = new Array<Clip>()
       for (const row of rows) {
-        clips.push(new Clip(row.name, row.duration, row.path))
+        clips.push(new Clip(row.name, row.duration, row.path, `/api/clip/${row.name}`));
       }
       resolve(clips);
     });
@@ -69,6 +75,40 @@ export function getAllClips() : Promise<Array<Clip>> {
   });
 }
 
+
+export function getAllMusics() : Promise<Array<Audio>> {
+  const db = getDatabase();
+  const sql = "SELECT * FROM AvailableSounds";
+  return new Promise((resolve, reject) => {
+    db.all(sql, (err, rows: Array<{name: string, duration: number, path: string}>) => {
+      if (err) {
+        reject(err);
+      }
+      const musics = new Array<Audio>()
+      for (const row of rows) {
+        musics.push(new Audio(row.name, row.path));
+      }
+      resolve(musics);
+    });
+    db.close();
+  });
+}
+
+export function replaceAllMusics(musics: Audio[]) {
+  const db = getDatabase();
+  db.run('DELETE FROM AvailableSounds;', (err) => {if (err) {console.log(err);}});
+  let placeholders = musics.map((music) => '(?, ?)').join(',');
+  let sql = 'INSERT INTO AvailableSounds(name, path) VALUES ' + placeholders;
+  db.run(
+    sql,
+    musics.flatMap((music) => [music.name, music.path]),
+    (err) => {
+    if (err) {
+      return console.error('query ', err.message);
+    }
+  });
+  db.close();
+}
 
 export function getRandomInt(max: number) : number {
   return Math.floor(Math.random() * max);

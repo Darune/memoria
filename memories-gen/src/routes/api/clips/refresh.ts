@@ -6,8 +6,8 @@ import { getClipFilePath  } from "~/data/utils";
 import ffprobe from "ffprobe";
 import which from "which";
 
-import { Clip } from "~/data/model";
-import { replaceClips } from "~/data/utils";
+import { Clip, Audio } from "~/data/model";
+import { replaceClips, replaceAllMusics } from "~/data/utils";
 import settings from "~/settings";
 
 
@@ -30,6 +30,17 @@ export async function GET({ params }: APIEvent) {
     console.error(err);
   }
   replaceClips(clips);
+  const music_files = await fs.promises.readdir(settings.MUSIC_FOLDER);
+  const musics: Audio[] = [];
+  for (const file of music_files) {
+    const filePath = join(settings.MUSIC_FOLDER, file);
+    musics.push(new Audio(
+      file,
+      filePath,
+    ))
+  }
+  replaceAllMusics(musics)
   console.log(clips);
-  return json(clips);
+  console.log(musics);
+  return json({ clips, musics });
 }
