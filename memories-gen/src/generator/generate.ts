@@ -101,8 +101,6 @@ export default function generate(
     memory.setFadeOut(fadeOut)
   }
   const audioIdx = getRandomInt(availableMusics.length);
-  console.log(audioIdx, availableMusics);
-  console.log(availableMusics[audioIdx])
   memory.setAudio(availableMusics[audioIdx]);
   return memory;
 }

@@ -40,7 +40,5 @@ export async function GET({ params }: APIEvent) {
     ))
   }
   replaceAllMusics(musics)
-  console.log(clips);
-  console.log(musics);
   return json({ clips, musics });
 }

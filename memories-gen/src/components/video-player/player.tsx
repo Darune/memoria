@@ -51,7 +51,8 @@ function buildPlaybackGraph(videoContext, memory: MemoryType) {
   const videoNodes = []
   let idx = 0 ;
   let currentDuration = 0;
-  let globalOutput = Combine(videoContext);
+  let combine = Combine(videoContext);
+  let globalOutput = combine;
   let inTransition = null;
   for (const clip of memory.clips) {
     const videoNode = videoContext.video(clip.clip.url, clip.start);
@@ -86,6 +87,13 @@ function buildPlaybackGraph(videoContext, memory: MemoryType) {
     const fadeOutEffect = getEffectNode(videoContext, memory.fadeOut);
     globalOutput.connect(fadeOutEffect);
     globalOutput = fadeOutEffect;
+  }
+
+  if (memory.audio) {
+    const audioNode = videoContext.audio(`/api/music/${memory.audio.name}`)
+    audioNode.startAt(0);
+    audioNode.stopAt(memory.duration);
+    audioNode.connect(combine);
   }
   return globalOutput;
 }

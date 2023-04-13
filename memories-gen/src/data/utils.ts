@@ -110,6 +110,20 @@ export function replaceAllMusics(musics: Audio[]) {
   db.close();
 }
 
+export function getMusicFilePath(musicName: string) : Promise<Audio> {
+  const db = getDatabase();
+  const sql = "SELECT * FROM AvailableSounds WHERE name == ?";
+  return new Promise((resolve, reject) => {
+    db.get(sql, [musicName], (err, row: {name: string, path: string}) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(new Audio(row.name, row.path));
+    });
+    db.close();
+  });
+}
+
 export function getRandomInt(max: number) : number {
   return Math.floor(Math.random() * max);
 }

@@ -1,13 +1,20 @@
 
-export const MAX_DURATION_PER_CLIP_SECONDS = 23;
-export const MIN_DURATION_PER_CLIP_SECONDS = 15;
+export const MAX_DURATION_PER_CLIP_SECONDS = 13;
+export const MIN_DURATION_PER_CLIP_SECONDS = 10;
 
 export const EXPECTED_MEMORY_DURATION = 60;
 
 // 0 to 1 probability
-export const PROBA_TRY_TRANSITION = 0.3;
-export const PROBA_CROSS_FADE =  0.2;
+export const PROBA_TRY_TRANSITION = 0.4;
+export const PROBA_CROSS_FADE =  0.4;
 export const PROBA_TO_COLOR_AND_BACK = 0;
+export const PROBA_MEMORY_FADE_IN = 0.7;
+export const PROBA_MEMORY_FADE_OUT = 0.7;
+export const PROBA_FADE_FLASH_TO_NORM = 0.4
+export const PROBA_FADE_NORM_TO_FLASH = 0.1
+export const PROBA_FADE_BLACK_TO_NORM = 0.4
+export const PROBA_FADE_NORM_TO_BLACK = 0.1
+
 export const AVAILABLE_TRANSITIONS = [
   {
     'type': 'crossfade',
@@ -23,12 +30,7 @@ export const AVAILABLE_TRANSITIONS = [
   }
 ];
 
-export const PROBA_MEMORY_FADE_IN = 0.7;
-export const PROBA_MEMORY_FADE_OUT = 0.7;
-export const PROBA_FADE_FLASH_TO_NORM = 0.4
-export const PROBA_FADE_NORM_TO_FLASH = 0.1
-export const PROBA_FADE_BLACK_TO_NORM = 0.4
-export const PROBA_FADE_NORM_TO_BLACK = 0.1
+
 
 export const AVAILABLE_FADE_INS = [
   {
