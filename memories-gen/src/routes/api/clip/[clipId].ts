@@ -7,7 +7,7 @@ const fileInfo = promisify(fs.stat)
 
 export async function GET({ request, params }: APIEvent) {
   const range = request.headers.range;
-  const clip = await getClipFilePath(params.clipId);
+  const clip = getClipFilePath(params.clipId);
   const { size: clipSize } = await fileInfo(clip.path);
 
 

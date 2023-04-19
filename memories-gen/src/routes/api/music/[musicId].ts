@@ -7,7 +7,7 @@ const fileInfo = promisify(fs.stat)
 
 export async function GET({ request, params }: APIEvent) {
   const range = request.headers.range;
-  const music = await getMusicFilePath(params.musicId);
+  const music = getMusicFilePath(params.musicId);
   const { size: musicSize } = await fileInfo(music.path);
 
 

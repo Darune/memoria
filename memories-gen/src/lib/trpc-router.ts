@@ -5,10 +5,9 @@ import generate from "~/generator/generate";
 const t = initTRPC.create();
 
 export const appRouter = t.router({
-  generateNewMemory: t.procedure.query(async () => {
-    const dbClips = await getAllClips();
-    const dbMusics = await getAllMusics();
-    console.log(dbClips, dbMusics);
+  generateNewMemory: t.procedure.query(() => {
+    const dbClips = getAllClips();
+    const dbMusics = getAllMusics();
     return generate(dbClips, dbMusics);
   }),
 

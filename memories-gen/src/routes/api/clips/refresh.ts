@@ -24,6 +24,7 @@ export async function GET({ params }: APIEvent) {
         name: file,
         duration: probe.streams[0].duration || 0,
         path: filePath,
+        url: `api/clip/${file}`,
       });
     };
   } catch (err) {
