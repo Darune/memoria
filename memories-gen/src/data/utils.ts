@@ -9,7 +9,6 @@ export function getDatabase() {
   try {
     db = new Database(
       join(settings.APP_ROJECT_DIR, "db/database.sqlite"),
-      { verbose: console.log }
     );
   } catch (e) {
     console.log(e);

@@ -115,10 +115,10 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}
       <canvas id="video-canvas" width="1000px" height="800px"></canvas>
       <Show when={props.debug}>
         <div>
-          <canvas id="visualisation-canvas" width="1000px" height="80"></canvas>
+          <canvas id="visualisation-canvas" width="1000px" height="120"></canvas>
         </div>
         <div>
-          <canvas id="graph-canvas" width="1000px" height="300"></canvas>
+          <canvas id="graph-canvas" width="1000px" height="360"></canvas>
         </div>
       </Show>
     </div>
