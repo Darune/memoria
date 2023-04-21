@@ -23,7 +23,6 @@
     "@vitest/coverage-c8": "^0.26.3",
     "@vitest/ui": "^0.26.3",
     "jsdom": "^20.0.3",
-    "prisma": "^4.13.0",
     "solid-js": "^1.6.11",
     "solid-start": "^0.2.19",
     "solid-start-node": "^0.2.19",
@@ -39,7 +38,19 @@
     "better-sqlite3": "^8.3.0",
     "ffprobe": "^1.1.2",
     "videocontext": "^0.54.0",
-    "vite-plugin-commonjs": "^0.6.2",
     "which": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowAny": [
+        "solid-js"
+      ]
+    },
+    "patchedDependencies": {
+      "better-sqlite3@8.3.0": "patches/better-sqlite3@8.3.0.patch"
+    }
   }
 }

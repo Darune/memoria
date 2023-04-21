@@ -5,6 +5,11 @@ name = "node"
 help = "NodeJS"
 
 [[commands]]
+package = "nodePackages.pnpm"
+name = "pnpm"
+help = "NodeJS pnpm"
+
+[[commands]]
 package = "yt-dlp"
 name = "yt-dlp"
 help = "youtube dl"
