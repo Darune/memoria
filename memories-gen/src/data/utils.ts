@@ -8,7 +8,10 @@ export function getDatabase() {
   let db;
   try {
     db = new Database(
-      join(settings.APP_ROJECT_DIR, "db/database.sqlite"),
+      join(settings.APP_ROJECT_DIR, "db/database.sqlite"), {
+        nativeBinding:
+          "./node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      },
     );
   } catch (e) {
     console.log(e);

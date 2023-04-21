@@ -67,8 +67,7 @@ function buildPlaybackGraph(videoContext, memory: MemoryType) {
       videoNode.stopAt(currentDuration + clip.duration);
       videoNode.connect(globalOutput);
       videoNodes[idx] = videoNode;
-    }
-    if (clip.transition) {
+    } else if (clip.transition) {
       const inTransitionDefinition = clip.transition
       inTransition = getTransitionNode(videoContext, inTransitionDefinition);
       currentDuration -= inTransitionDefinition.duration;

@@ -6,7 +6,7 @@ import fs from 'fs';
 const fileInfo = promisify(fs.stat)
 
 export async function GET({ request, params }: APIEvent) {
-  const range = request.headers.range;
+  const range = request.headers.get('range');
   const music = getMusicFilePath(params.musicId);
   const { size: musicSize } = await fileInfo(music.path);
 
@@ -32,7 +32,7 @@ export async function GET({ request, params }: APIEvent) {
       new Response()
       return new Response("", {
         headers: {
-          "Content-Range": `bytes */${musicSize - 1}`
+          "Content-Range": `bytes */${musicSize}`
         },
         status: 416
       } )
@@ -42,7 +42,7 @@ export async function GET({ request, params }: APIEvent) {
     return new Response(
       readable, {
         headers: {
-          "Content-Range": `bytes ${start}-${end}/${musicSize - 1}`,
+          "Content-Range": `bytes ${start}-${end}/${musicSize}`,
           "Accept-Ranges": "bytes",
           "Content-Length": end - start + 1,
           "Content-Type": "video/mp4"
@@ -57,7 +57,7 @@ export async function GET({ request, params }: APIEvent) {
         headers: {
           "Content-Length": musicSize,
           "Content-Type": "video/mp4",
-          "Content-Range": `bytes 0-${musicSize-1}/${musicSize - 1}`,
+          "Content-Range": `bytes 0-${musicSize-1}/${musicSize}`,
         },
         status: 206,
       },
