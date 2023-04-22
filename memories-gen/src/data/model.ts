@@ -39,12 +39,16 @@ export interface AudioType {
 }
 
 export interface MemoryType {
+  id?: number;
+  name?: string,
   clips: Array<MemoryClipType>;
   duration: number;
   fadeIn?: EffectType;
   fadeOut?: EffectType;
   audio?: AudioType;
   effectsTimeline?: Array<EffectType>;
+  thumbnailTime: number;
+  thumbnailImage?: string;
 }
 
 
@@ -87,16 +91,20 @@ export class MemoryClip implements MemoryClipType {
 }
 
 export class Memory implements MemoryType {
+  name?: string;
   clips: Array<MemoryClipType>;
   duration: number;
   fadeIn?: EffectType;
   fadeOut?: EffectType;
   audio?: AudioType;
   effectsTimeline?: Array<EffectType>;
+  thumbnailTime: number;
+  thumbnailImage?: string;
 
   constructor() {
     this.clips = new Array<MemoryClip>();
     this.duration = 0;
+    this.thumbnailTime = 0;
   }
 
   pushClip(memoryClip: MemoryClip) {
@@ -133,6 +141,9 @@ export class Memory implements MemoryType {
 
   setFadeOut(fadeOut?: EffectType) {
     this.fadeOut = fadeOut;
+  }
+  setThumbnailTime(time: number) {
+    this.thumbnailTime = time;
   }
 
   setAudio(audio: AudioType) {

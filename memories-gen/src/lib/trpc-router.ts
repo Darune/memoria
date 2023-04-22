@@ -1,7 +1,9 @@
+import { z } from 'zod';
 import { initTRPC } from '@trpc/server';
-import { getAllClips, getAllMusics, archiveMemory } from "~/data/utils";
+import { getAllClips, getAllMusics, archiveMemory, getAllMemories, getMemory } from "~/data/utils";
 import generate from "~/generator/generate";
 import { memoryTypeSchema } from "~/data/zod-schema";
+import { MemoryType } from '~/data/model';
 
 const t = initTRPC.create();
 
@@ -14,8 +16,16 @@ export const appRouter = t.router({
   archiveMemory: t.procedure.input(memoryTypeSchema).mutation(
     (opts) => {
       const { input: finalMemory } = opts
-      console.log(archiveMemory(finalMemory));
+      console.log(finalMemory);
+      archiveMemory(finalMemory as MemoryType);
     }
   ),
+  listMemories: t.procedure.query(() => {
+    return {memories: getAllMemories()};
+  }),
+  getMemory: t.procedure.input(z.string()).query((opts) => {
+    const { input } = opts;
+    return getMemory(input);
+  })
 });
 export type AppRouter = typeof appRouter;

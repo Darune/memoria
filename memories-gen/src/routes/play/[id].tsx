@@ -5,9 +5,12 @@ import { MemoryType } from "~/data/model";
 import { client } from "~/lib/trpc-client";
 
 
-export function routeData() {
-  return createRouteData(async () => {
-    return await client.generateNewMemory.query();
+export function routeData({ params }) {
+  console.log(params);
+  return createRouteData(async (key) => {
+    return await client.getMemory.query(key[0]);
+  }, {
+    key: () => [params.id]
   });
 }
 export default function CreatePage() {
@@ -25,10 +28,8 @@ export default function CreatePage() {
                 <ClientVideoPlayer
                   memory={memory}
                   debug={true}
-                  isEditing={true}
+                  isEditing={false}
                   onEnded={(finalMemory: MemoryType) => {
-                    console.log(JSON.stringify(finalMemory));
-                    client.archiveMemory.mutate(finalMemory);
                   }}/>
               </div>
               <ul>

@@ -21,5 +21,5 @@ void main(){
     vec4 d = texture2D(u_image_a, coord );
     color_a += pow(d, vec4(2.5));
   }
-	gl_FragColor = color_a * .80;
+	gl_FragColor = color_a;// * .80;
 }

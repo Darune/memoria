@@ -4,7 +4,7 @@ import { MemoryType } from "~/data/model";
 
 let VideoPlayer = unstable_clientOnly(() => import("~/components/video-player/player"));
 
-export default function ClientVideoPlayer(props: { memory: MemoryType, debug: boolean, onEnded: CallableFunction }) {
+export default function ClientVideoPlayer(props: { memory: MemoryType, debug: boolean, onEnded: CallableFunction, isEditing: boolean }) {
   const [ isClientSide, setIsClientSide ] = createSignal(false);
   onMount(() => {
     setIsClientSide(true);

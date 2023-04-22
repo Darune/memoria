@@ -102,5 +102,6 @@ export default function generate(
   }
   const audioIdx = getRandomInt(availableMusics.length);
   memory.setAudio(availableMusics[audioIdx]);
+  memory.setThumbnailTime(getRandomInt(memory.duration));
   return memory;
 }

@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import settings from "~/settings";
 import { join } from "path";
-import { Clip, Audio, MemoryType } from "./model";
+import { Clip, Audio, MemoryType, Memory } from "./model";
 
 
 export function getDatabase() {
@@ -64,14 +64,6 @@ export function replaceAllMusics(musics: Audio[]) {
   db.prepare(sql).run(...musics.flatMap((music) => [music.name, music.path]));
 }
 
-export function archiveMemory(memory: MemoryType) {
-  const db = getDatabase();
-  const id = db.prepare('INSERT into ArchivedMemories(memory) VALUES (?)').run(
-    JSON.stringify(memory)
-  );
-  return id.lastInsertRowid;
-}
-
 export function getMusicFilePath(musicName: string) : Audio {
   const db = getDatabase();
   const sql = "SELECT * FROM AvailableSounds WHERE name == ?";
@@ -82,4 +74,39 @@ export function getMusicFilePath(musicName: string) : Audio {
 
 export function getRandomInt(max: number) : number {
   return Math.floor(Math.random() * max);
+}
+
+export function archiveMemory(memory: MemoryType) {
+  const db = getDatabase();
+  const id = db.prepare('INSERT into ArchivedMemories(memory) VALUES (?)').run(
+    JSON.stringify(memory)
+  );
+  return id.lastInsertRowid;
+}
+
+export function getAllMemories() : Array<MemoryType> {
+  const db = getDatabase();
+  const sql = "SELECT * FROM ArchivedMemories";
+  const rows = db.prepare(sql).all();
+  const memories = new Array<MemoryType>();
+
+  for (const row of rows) {
+    memories.push({
+      id: row.id,
+      name: `cecilia ${row.id}`,
+      ...JSON.parse(row.memory),
+    })
+  }
+  return memories;
+}
+
+export function getMemory(id: string) : MemoryType {
+  const db = getDatabase();
+  const sql = "SELECT * FROM ArchivedMemories where id = ?";
+  const row = db.prepare(sql).get(id);
+  return {
+    id: row.id,
+    name: `cecilia ${row.id}`,
+    ...JSON.parse(row.memory),
+  };
 }

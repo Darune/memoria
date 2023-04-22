@@ -181,39 +181,62 @@ class EffectHandler {
     })
     return this.effectsTimeline;
   }
+
+  replayEffectTimeline(effectsTimeline: Array<EffectType>) {
+    for (const effect of effectsTimeline) {
+      this.videoContext.registerTimelineCallback(effect.start, () => {
+        this.toggleEffect(effect.type);
+      });
+      this.videoContext.registerTimelineCallback(effect.stop, () => {
+        this.toggleEffect(effect.type);
+      });
+    }
+  }
 }
 
-export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean, onEnded: CallableFunction}) {
-  const [rootNode, setRootNode] = createSignal(null);
+export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean, onEnded: CallableFunction, isEditing: boolean}) {
+  const [thumbnail, setThumbnail] = createSignal<string>(null);
   const effectStack = [];
   onMount(() => {
-    const canvasRef = document.getElementById('video-canvas');
+    const canvasRef: HTMLCanvasElement = document.getElementById('video-canvas') as HTMLCanvasElement;
     const videoContext = new VideoContext(canvasRef);
     let globalOutput = buildPlaybackGraph(videoContext, props.memory);
-    setRootNode(globalOutput)
     const effectHandler = new EffectHandler(videoContext, globalOutput);
     globalOutput.connect(videoContext.destination);
     videoContext.play();
     if (props.debug) {
       InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');
     }
-    document.addEventListener("keyup", (e) => {
-      if (e.key == 'e') {
-        effectHandler.toggleEffect('echo');
-      }
-      if (e.key == 'c') {
-        effectHandler.toggleEffect('colorbar');
-      }
-      InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');
-    });
+
+      // capture the canvas as an image
+
+
+    if (props.isEditing) {
+      videoContext.registerTimelineCallback(props.memory.thumbnailTime, () => {
+        var img = canvasRef.toDataURL("image/png", 1.0);
+        setThumbnail(img);
+      });
+      document.addEventListener("keyup", (e) => {
+        if (e.key == 'e') {
+          effectHandler.toggleEffect('echo');
+        }
+        if (e.key == 'c') {
+          effectHandler.toggleEffect('colorbar');
+        }
+        InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');
+      });
+    } else if (props.memory.effectsTimeline) {
+      effectHandler.replayEffectTimeline(props.memory.effectsTimeline);
+    }
+
     videoContext.registerCallback(
       VideoContext.EVENTS.ENDED,
       () => {
         const finalMemory = {
           ...props.memory,
           effectsTimeline: effectHandler.getEffectsTimeLine(),
+          thumbnailImage: thumbnail(),
         }
-        console.log(JSON.stringify(finalMemory));
         props.onEnded(finalMemory);
       }
     );
@@ -227,6 +250,11 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
         </div>
         <div>
           <canvas id="graph-canvas" width="1000px" height="360"></canvas>
+        </div>
+        <div>
+          <Show when={thumbnail()}>
+            <img width={256} height={256} src={thumbnail()} />
+          </Show>
         </div>
       </Show>
     </div>

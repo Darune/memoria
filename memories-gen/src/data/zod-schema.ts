@@ -45,5 +45,6 @@ export const memoryTypeSchema = z.object({
   fadeIn: effectTypeSchema.optional(),
   fadeOut: effectTypeSchema.optional(),
   audio: audioTypeSchema.optional(),
-  effectsTimeline: z.array(effectTypeSchema).optional()
+  effectsTimeline: z.array(effectTypeSchema).optional(),
+  thumbnailImage: z.string().optional()
 })
