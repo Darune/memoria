@@ -44,6 +44,7 @@ export interface MemoryType {
   fadeIn?: EffectType;
   fadeOut?: EffectType;
   audio?: AudioType;
+  effectsTimeline?: Array<EffectType>;
 }
 
 
@@ -91,6 +92,7 @@ export class Memory implements MemoryType {
   fadeIn?: EffectType;
   fadeOut?: EffectType;
   audio?: AudioType;
+  effectsTimeline?: Array<EffectType>;
 
   constructor() {
     this.clips = new Array<MemoryClip>();
@@ -135,6 +137,9 @@ export class Memory implements MemoryType {
 
   setAudio(audio: AudioType) {
     this.audio = audio;
+  }
+  setEffectTimeline(effectsTimeline: Array<EffectType>) {
+    this.effectsTimeline = effectsTimeline;
   }
 };
 

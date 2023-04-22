@@ -1,6 +1,7 @@
 import { For, createEffect, Show } from "solid-js";
 import { useRouteData, createRouteData } from "solid-start";
 import ClientVideoPlayer from "~/components/video-player/client-player";
+import { MemoryType } from "~/data/model";
 import { client } from "~/lib/trpc-client";
 
 
@@ -22,7 +23,13 @@ export default function CreatePage() {
           return (
             <>
               <div>
-                <ClientVideoPlayer memory={memory} debug={true} />
+                <ClientVideoPlayer
+                  memory={memory}
+                  debug={true}
+                  onEnded={(finalMemory: MemoryType) => {
+                    console.log(JSON.stringify(finalMemory));
+                    client.archiveMemory.mutate(finalMemory);
+                  }}/>
               </div>
               <ul>
                 <For each={memory.clips}>

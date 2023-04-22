@@ -1,5 +1,5 @@
 import { createSignal, onMount, Show } from "solid-js";
-import { MemoryType } from "~/data/model";
+import { MemoryType, EffectType } from "~/data/model";
 import VideoContext from 'videocontext';
 import { Combine } from "./compositor/combine";
 import getTransitionNode from "./transitions";
@@ -108,6 +108,8 @@ class EffectHandler {
   videoContext : any;
   effectsNodes : any;
   effectStack : Array<string>;
+  effectsTimeline : Array<EffectType>;
+  effectsDefinitions : Record<string, EffectType>;
   rootNode: any;
 
   constructor(videoContext: any, rootNode: any) {
@@ -118,6 +120,8 @@ class EffectHandler {
       this.effectsNodes[effectType] = getEffectNode(videoContext, {type: effectType, start: 0});
     }
     this.effectStack = [];
+    this.effectsTimeline = [];
+    this.effectsDefinitions = {};
   }
 
   activateEffect(effectType: string) {
@@ -130,6 +134,11 @@ class EffectHandler {
     previousNode.connect(this.effectsNodes[effectType]);
     this.effectsNodes[effectType].connect(this.videoContext.destination);
     this.effectStack.push(effectType);
+    this.effectsDefinitions[effectType] = {
+      type: effectType,
+      start: this.videoContext.currentTime,
+    }
+    this.effectsTimeline.push(this.effectsDefinitions[effectType])
   }
 
   deactivateEffect(effectType: string) {
@@ -154,6 +163,8 @@ class EffectHandler {
       previousEffect.connect(nextEffect);
     }
     this.effectStack.splice(effectIdx, 1);
+    this.effectsDefinitions[effectType].stop = this.videoContext.currentTime
+    delete this.effectsDefinitions[effectType];
   }
 
   toggleEffect(effectType: string) {
@@ -163,9 +174,16 @@ class EffectHandler {
       this.activateEffect(effectType);
     }
   }
+
+  getEffectsTimeLine() {
+    Object.values(this.effectsDefinitions).forEach((remainingEffect) => {
+      remainingEffect.stop = this.videoContext.currentTime;
+    })
+    return this.effectsTimeline;
+  }
 }
 
-export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}) {
+export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean, onEnded: CallableFunction}) {
   const [rootNode, setRootNode] = createSignal(null);
   const effectStack = [];
   onMount(() => {
@@ -188,7 +206,17 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}
       }
       InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');
     });
-
+    videoContext.registerCallback(
+      VideoContext.EVENTS.ENDED,
+      () => {
+        const finalMemory = {
+          ...props.memory,
+          effectsTimeline: effectHandler.getEffectsTimeLine(),
+        }
+        console.log(JSON.stringify(finalMemory));
+        props.onEnded(finalMemory);
+      }
+    );
   });
   return (
     <div>

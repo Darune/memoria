@@ -1,24 +1,20 @@
 import Database from "better-sqlite3";
 import settings from "~/settings";
 import { join } from "path";
-import { Clip, Audio } from "./model";
+import { Clip, Audio, MemoryType } from "./model";
 
 
 export function getDatabase() {
-  let db;
-  try {
-    db = new Database(
-      join(settings.APP_ROJECT_DIR, "db/database.sqlite"), {
-        nativeBinding:
-          "./node_modules/better-sqlite3/build/Release/better_sqlite3.node",
-      },
-    );
-  } catch (e) {
-    console.log(e);
-  }
+  const db = new Database(
+    join(settings.APP_ROJECT_DIR, "db/database.sqlite"), {
+      nativeBinding:
+        "./node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    },
+  );
   db.prepare('CREATE TABLE IF NOT EXISTS AvailableClips(name TEXT, duration REAL, path TEXT);').run();
   db.prepare('CREATE TABLE IF NOT EXISTS AvailableSounds(name TEXT, path TEXT);').run();
-  return db
+  db.prepare('CREATE TABLE IF NOT EXISTS ArchivedMemories(id INTEGER PRIMARY KEY AUTOINCREMENT, memory TEXT);').run();
+  return db;
 }
 
 
@@ -66,6 +62,14 @@ export function replaceAllMusics(musics: Audio[]) {
   let placeholders = musics.map((music) => '(?, ?)').join(',');
   let sql = 'INSERT INTO AvailableSounds(name, path) VALUES ' + placeholders;
   db.prepare(sql).run(...musics.flatMap((music) => [music.name, music.path]));
+}
+
+export function archiveMemory(memory: MemoryType) {
+  const db = getDatabase();
+  const id = db.prepare('INSERT into ArchivedMemories(memory) VALUES (?)').run(
+    JSON.stringify(memory)
+  );
+  return id.lastInsertRowid;
 }
 
 export function getMusicFilePath(musicName: string) : Audio {
