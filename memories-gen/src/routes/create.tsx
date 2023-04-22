@@ -1,6 +1,8 @@
 import { For, createEffect, Show } from "solid-js";
-import { useRouteData, createRouteData } from "solid-start";
+import { useNavigate, useRouteData, createRouteData } from "solid-start";
+
 import ClientVideoPlayer from "~/components/video-player/client-player";
+
 import { MemoryType } from "~/data/model";
 import { client } from "~/lib/trpc-client";
 
@@ -11,6 +13,7 @@ export function routeData() {
   });
 }
 export default function CreatePage() {
+  const navigate = useNavigate();
   const data = useRouteData<typeof routeData>();
   createEffect(() => {
     if (data.state !== 'ready') return;
@@ -27,8 +30,8 @@ export default function CreatePage() {
                   debug={true}
                   isEditing={true}
                   onEnded={(finalMemory: MemoryType) => {
-                    console.log(JSON.stringify(finalMemory));
                     client.archiveMemory.mutate(finalMemory);
+                    navigate("/archives");
                   }}/>
               </div>
               <ul>
