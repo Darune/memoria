@@ -1,4 +1,4 @@
-import { onMount, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { MemoryType } from "~/data/model";
 import VideoContext from 'videocontext';
 import { Combine } from "./compositor/combine";
@@ -80,11 +80,13 @@ function buildPlaybackGraph(videoContext, memory: MemoryType) {
   if (memory.fadeIn) {
     const fadeInEffect = getEffectNode(videoContext, memory.fadeIn);
     globalOutput.connect(fadeInEffect);
+    fadeInEffect.connect(videoContext.destination);
     globalOutput = fadeInEffect;
   }
   if (memory.fadeOut) {
     const fadeOutEffect = getEffectNode(videoContext, memory.fadeOut);
     globalOutput.connect(fadeOutEffect);
+    fadeOutEffect.connect(videoContext.destination);
     globalOutput = fadeOutEffect;
   }
 
@@ -97,17 +99,96 @@ function buildPlaybackGraph(videoContext, memory: MemoryType) {
   return globalOutput;
 }
 
+const AVAILABLE_INTERACTIVE_EFFECTS = [
+  'echo', 'colorbar'
+];
+
+
+class EffectHandler {
+  videoContext : any;
+  effectsNodes : any;
+  effectStack : Array<string>;
+  rootNode: any;
+
+  constructor(videoContext: any, rootNode: any) {
+    this.videoContext = videoContext
+    this.rootNode = rootNode
+    this.effectsNodes = {};
+    for (const effectType of AVAILABLE_INTERACTIVE_EFFECTS) {
+      this.effectsNodes[effectType] = getEffectNode(videoContext, {type: effectType, start: 0});
+    }
+    this.effectStack = [];
+  }
+
+  activateEffect(effectType: string) {
+    const nbEffects = this.effectStack.length;
+    let previousNode = this.rootNode
+    if (nbEffects == 1) {
+      previousNode = this.effectsNodes[this.effectStack[nbEffects - 1]];
+    }
+    previousNode.disconnect()
+    previousNode.connect(this.effectsNodes[effectType]);
+    this.effectsNodes[effectType].connect(this.videoContext.destination);
+    this.effectStack.push(effectType);
+  }
+
+  deactivateEffect(effectType: string) {
+    const nbEffects = this.effectStack.length;
+    const effectIdx = this.effectStack.indexOf(effectType);
+    this.effectsNodes[effectType].disconnect();
+    if (effectIdx == 0) {
+      let nextTarget = this.videoContext.destination;
+      if (nbEffects > 1) {
+        nextTarget = this.effectsNodes[this.effectStack[effectIdx + 1]];
+      }
+      this.rootNode.disconnect();
+      this.rootNode.connect(nextTarget);
+    } else if (effectIdx == nbEffects - 1) {
+      const previousEffect = this.effectsNodes[this.effectStack[effectIdx - 1]];
+      previousEffect.disconnect()
+      previousEffect.connect(this.videoContext.destination);
+    } else {
+      const previousEffect = this.effectsNodes[this.effectStack[effectIdx - 1]];
+      const nextEffect = this.effectsNodes[this.effectStack[effectIdx + 1]];
+      previousEffect.disconnect();
+      previousEffect.connect(nextEffect);
+    }
+    this.effectStack.splice(effectIdx, 1);
+  }
+
+  toggleEffect(effectType: string) {
+    if (this.effectStack.includes(effectType)) {
+      this.deactivateEffect(effectType);
+    } else {
+      this.activateEffect(effectType);
+    }
+  }
+}
+
 export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean}) {
+  const [rootNode, setRootNode] = createSignal(null);
+  const effectStack = [];
   onMount(() => {
     const canvasRef = document.getElementById('video-canvas');
     const videoContext = new VideoContext(canvasRef);
-
-    const globalOutput = buildPlaybackGraph(videoContext, props.memory);
+    let globalOutput = buildPlaybackGraph(videoContext, props.memory);
+    setRootNode(globalOutput)
+    const effectHandler = new EffectHandler(videoContext, globalOutput);
     globalOutput.connect(videoContext.destination);
     videoContext.play();
     if (props.debug) {
       InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');
     }
+    document.addEventListener("keyup", (e) => {
+      if (e.key == 'e') {
+        effectHandler.toggleEffect('echo');
+      }
+      if (e.key == 'c') {
+        effectHandler.toggleEffect('colorbar');
+      }
+      InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');
+    });
+
   });
   return (
     <div>

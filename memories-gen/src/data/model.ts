@@ -27,9 +27,9 @@ export interface MemoryClipTransitionType {
 
 export interface EffectType {
   type: string;
-  duration: number;
+  duration?: number;
   start: number;
-  stop: number;
+  stop?: number;
 }
 
 export interface AudioType {
