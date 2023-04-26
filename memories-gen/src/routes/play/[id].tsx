@@ -5,8 +5,7 @@ import { MemoryType } from "~/data/model";
 import { client } from "~/lib/trpc-client";
 
 
-export function routeData({ params }) {
-  console.log(params);
+export function routeData({ params } : { params: { id: string}}) {
   return createRouteData(async (key) => {
     return await client.getMemory.query(key[0]);
   }, {

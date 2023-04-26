@@ -13,7 +13,7 @@ export async function GET({ request, params }: APIEvent) {
 
   if (range) {
     /** Extracting Start and End value from Range Header */
-    let [start, end] = range.replace(/bytes=/, "").split("-");
+    let [start, end]: any = range.replace(/bytes=/, "").split("-");
     start = parseInt(start, 10);
     end = end ? parseInt(end, 10) : musicSize - 1;
 

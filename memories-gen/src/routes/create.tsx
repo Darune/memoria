@@ -19,11 +19,11 @@ export default function CreatePage() {
     if (data.state !== 'ready') return;
   });
   return (
-    <>
+    <div class="container mx-auto">
       <Show when={ data() } keyed>
         {(memory) => {
           return (
-            <>
+            <div class="container mx-auto">
               <div>
                 <ClientVideoPlayer
                   memory={memory}
@@ -31,7 +31,7 @@ export default function CreatePage() {
                   isEditing={true}
                   onEnded={(finalMemory: MemoryType) => {
                     client.archiveMemory.mutate(finalMemory);
-                    navigate("/archives");
+                    setTimeout(() => navigate("/archives"), 200);
                   }}/>
               </div>
               <ul>
@@ -42,10 +42,10 @@ export default function CreatePage() {
               <div>
                 duration: {memory.duration}, thumbnailTime: {memory.thumbnailTime}, music: {memory.audio?.name}
               </div>
-            </>
+            </div>
           );
         }}
       </Show>
-    </>
+    </div>
   );
 }

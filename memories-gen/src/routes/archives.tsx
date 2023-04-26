@@ -1,4 +1,4 @@
-import { For, createEffect, Show } from "solid-js";
+import { For, createEffect, Show, createSignal } from "solid-js";
 import { useRouteData, createRouteData } from "solid-start";
 import { client } from "~/lib/trpc-client";
 
@@ -14,7 +14,7 @@ export default function CreatePage() {
     if (data.state !== 'ready') return;
   });
   return (
-    <>
+    <div class="flex gap-6 container px-4 py-4">
       <Show when={ data() } keyed>
         {(memory) => {
           const { memories } = memory;
@@ -24,9 +24,11 @@ export default function CreatePage() {
                 <div>
                     <a href={`/play/${memory.id}`}>
                       <div>
-                        <img width={256} height={240} src={memory.thumbnailImage} />
+                        <img width={256} height={240} src={`/api/memory/${memory.id}/thumbnail`} />
                       </div>
-                      <span>{memory.name}</span>
+                      <div class="flex w-full justify-center">
+                        <span class="font-mono uppercase">{memory.name}</span>
+                      </div>
                     </a>
                 </div>
               )}
@@ -34,6 +36,6 @@ export default function CreatePage() {
           )
         }}
       </Show>
-    </>
+    </div>
   );
 }

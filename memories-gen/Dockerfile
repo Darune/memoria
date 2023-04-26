@@ -21,6 +21,7 @@ RUN mkdir /sounds/
 RUN mkdir /src_videos/
 RUN mkdir /src_sounds/
 RUN pnpm run build
+RUN rm db/database.sqlite
 
 EXPOSE 3000
 CMD ./docker-entry-point.sh

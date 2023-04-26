@@ -1,20 +1,16 @@
 import { A } from 'solid-start';
-import tree from '~/assets/tree.svg';
+import Tree from '~/assets/tree.svg?component-solid';
+import Navigation from '~/components/navigation';
 import "./index.css";
 
 export default function Home() {
   return (
-    <main>
-      <img src={tree}/>
-      <div>
-        <A href="/create"> Create </A>
+    <main class="relative">
+      {/* <img src={tree}/> */}
+      <div class="w-screen flex justify-center">
+        <Tree class="max-h-screen"/>
       </div>
-      <div>
-        <A href="/archives"> Archives </A>
-      </div>
-      <div>
-        <A href="/refresh"> refresh video </A>
-      </div>
+      <Navigation />
     </main>
   );
 }
