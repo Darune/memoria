@@ -1,6 +1,7 @@
 import { createSignal, onMount, Show } from "solid-js";
 import { MemoryType, EffectType } from "~/data/model";
 import VideoContext from 'videocontext';
+import KeyboardNav from "../keyboard-nav";
 import { Combine } from "./compositor/combine";
 import getTransitionNode from "./transitions";
 import getEffectNode from "./effects";
@@ -196,12 +197,19 @@ class EffectHandler {
 
 export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean, onEnded: CallableFunction, isEditing: boolean}) {
   const [thumbnail, setThumbnail] = createSignal<string>(null);
-  const effectStack = [];
+  let effectHandler = null;
+
+  const applyEffect = (effectType) => {
+    if (!effectHandler || !props.isEditing) {
+      return
+    }
+    effectHandler.toggleEffect(effectType);
+  }
   onMount(() => {
     const canvasRef: HTMLCanvasElement = document.getElementById('video-canvas') as HTMLCanvasElement;
     const videoContext = new VideoContext(canvasRef);
     let globalOutput = buildPlaybackGraph(videoContext, props.memory);
-    const effectHandler = new EffectHandler(videoContext, globalOutput);
+    effectHandler = new EffectHandler(videoContext, globalOutput);
     globalOutput.connect(videoContext.destination);
     videoContext.play();
     if (props.debug) {
@@ -215,15 +223,6 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
       videoContext.registerTimelineCallback(props.memory.thumbnailTime, () => {
         var img = canvasRef.toDataURL("image/png", 1.0);
         setThumbnail(img);
-      });
-      document.addEventListener("keyup", (e) => {
-        if (e.key == 'e') {
-          effectHandler.toggleEffect('echo');
-        }
-        if (e.key == 'c') {
-          effectHandler.toggleEffect('colorbar');
-        }
-        InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');
       });
     } else if (props.memory.effectsTimeline) {
       effectHandler.replayEffectTimeline(props.memory.effectsTimeline);
@@ -243,6 +242,13 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
   });
   return (
     <div>
+      <KeyboardNav
+        onRedClicked={() => {applyEffect('echo');}}
+        onGreenClicked={() => {applyEffect('colorbar');}}
+        onBlueClicked={() => (null)}
+        onYellowClicked={() => (null)}
+        onWhiteClicked={() => (null)}
+      />
       <canvas id="video-canvas" width="1000px" height="800px"></canvas>
       <Show when={props.debug}>
         <div>
