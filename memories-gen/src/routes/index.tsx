@@ -1,16 +1,74 @@
-import { A } from 'solid-start';
-import Tree from '~/assets/tree.svg?component-solid';
-import Navigation from '~/components/navigation';
-import "./index.css";
+import { useNavigate, useRouteData, createRouteData, refetchRouteData } from 'solid-start';
+
+import TreeAndWords from '~/components/tree';
+import KeyboardNav from '~/components/keyboard-nav';
+import { setEditingMemory } from '~/stores/memory';
+import { client } from "~/lib/trpc-client";
+import { createEffect, createSignal } from 'solid-js';
+import './index.css';
+import { ClipType } from '~/data/model';
+
+export function routeData() : any {
+  return createRouteData(async () => {
+    const results = await Promise.all([
+      client.getWords.query(), client.generateNewMemory.query()
+    ]);
+    return {words: results[0], memory: results[1]};
+  });
+}
 
 export default function Home() {
+  const fetchedData = useRouteData<typeof routeData>();
+  const [ shouldEdit, setShouldEdit ] = createSignal(false);
+  const [ animateConfig, setAnimateConfig ] = createSignal<any>(null);
+  const [ words, setWords ] = createSignal<any>(null);
+  const navigate = useNavigate();
+
+  const runGeneration = () => {
+    refetchRouteData();
+  };
+  createEffect(() => {
+    if (fetchedData.state == 'refreshing') setShouldEdit(true);
+    if (fetchedData.state !== 'ready') return;
+    if (words() == null) {
+      const { fwords } = fetchedData();
+      console.log('settingWords', {...fetchedData()});
+      setWords(({...fetchedData().words}));
+    }
+    if (shouldEdit()) {
+      const { memory } = fetchedData();
+      setEditingMemory({...memory});
+      setAnimateConfig({
+        climNames: memory.clips.map(
+          (clip: ClipType) => clip.name
+        ),
+        sound: memory.audio?.name,
+        timeout: 8000,
+      });
+      setShouldEdit(false);
+    }
+  });
+  const onTreeAnimateEnded = () => {
+    //navigate('/create');
+    console.log('done');
+  }
   return (
-    <main class="relative">
+    <main class="h-screen flex justify-center flex-col">
       {/* <img src={tree}/> */}
-      <div class="w-screen flex justify-center">
-        <Tree class="max-h-screen"/>
+      {/* <Tree class="flex-grow"/> */}
+      <div class="flex-grow">
+        <TreeAndWords
+          animateTowards={animateConfig()} onAnimateEnd={onTreeAnimateEnded}
+          words={words()}
+        />
       </div>
-      <Navigation />
+      <KeyboardNav
+        onRedClicked={() => {runGeneration();}}
+        onGreenClicked={() => {navigate('/archives')}}
+        helpTexts={{red: 'start', green: 'archives'}}
+        availableColors={['red', 'green']}
+        showHelp
+      />
     </main>
   );
 }

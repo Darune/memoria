@@ -1,4 +1,4 @@
-body {
+/* body {
   font-family: Gordita, Roboto, Oxygen, Ubuntu, Cantarell,
     'Open Sans', 'Helvetica Neue', sans-serif;
 }
@@ -33,4 +33,38 @@ p {
   p {
     max-width: none;
   }
+} */
+
+div.branch.active {
+  background-color: #ffffff;
+}
+div.root.active {
+  background-color: #ffffff;
+}
+path.branch.active {
+  fill:#ffffff;
+}
+path.root.active {
+  fill:#ffffff;
+}
+
+path.branch {
+  fill:#9ca3af
+;
+}
+path.root {
+  fill:#9ca3af
+;
+}
+  /* .cls-1{
+    fill:#1d1d1b;
+  } */
+path.tree-body {
+  fill: #8c8c8c;
+}
+
+.branch, .root {
+  transition-property: fill, background-color;
+  transition-duration: 500ms;
+  transition-timing-function: ease-in-out;
 }

@@ -17,13 +17,13 @@ import "./root.css";
 
 export default function Root() {
   return (
-    <Html lang="en">
+    <Html lang="en" class="dark">
       <Head>
         <Title>Chere Cecilia</Title>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <Body class="bg-slate-50">
+      <Body class="dark:bg-slate-800">
         <Suspense>
           <ErrorBoundary>
             <Routes>

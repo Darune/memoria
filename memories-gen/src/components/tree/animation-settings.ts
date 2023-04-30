@@ -1,0 +1,8 @@
+
+const MAX_BRANCHE_ANIMATED = 2;
+const MAX_ROOT_ANIMATED = 1;
+
+export default {
+  MAX_BRANCHE_ANIMATED,
+  MAX_ROOT_ANIMATED
+};

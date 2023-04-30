@@ -2,7 +2,7 @@ import { For, createEffect, Show } from "solid-js";
 import { useNavigate, useRouteData, createRouteData } from "solid-start";
 
 import ClientVideoPlayer from "~/components/video-player/client-player";
-
+import { editingMemory } from "~/stores/memory";
 import { MemoryType } from "~/data/model";
 import { client } from "~/lib/trpc-client";
 
@@ -12,12 +12,14 @@ export function routeData() {
     return await client.generateNewMemory.query();
   });
 }
+
 export default function CreatePage() {
   const navigate = useNavigate();
-  const data = useRouteData<typeof routeData>();
-  createEffect(() => {
-    if (data.state !== 'ready') return;
-  });
+  const fetchData = useRouteData<typeof routeData>();
+  const data = () => editingMemory() || fetchData();
+  // createEffect(() => {
+  //   if (data.state !== 'ready') return;
+  // });
   return (
     <div class="container mx-auto">
       <Show when={ data() } keyed>

@@ -78,10 +78,6 @@ export function getMusicFilePath(musicName: string) : Audio {
   return new Audio(row.name, row.path);
 }
 
-export function getRandomInt(max: number) : number {
-  return Math.floor(Math.random() * max);
-}
-
 export function archiveMemory(memory: MemoryType) {
   const db = getDatabase();
   const id = db.prepare('INSERT into ArchivedMemories(memory, thumbnail) VALUES (?, ?)').run(
@@ -125,4 +121,13 @@ export function getMemoryThumbNail(id: string) : string {
   const row = db.prepare(sql).get(id);
   db.close();
   return row.thumbnail;
+}
+
+export function getWords(): {videoWords: Array<string>, soundWords: Array<string>} {
+  const db = getDatabase();
+  const sql = "SELECT name from AvailableClips";
+  const videoWords = db.prepare(sql).all().map((row) => row.name);
+  const sqlSounds = "SELECT name from AvailableSounds";
+  const soundWords = db.prepare(sqlSounds).all().map((row) => row.name);
+  return {videoWords, soundWords};
 }

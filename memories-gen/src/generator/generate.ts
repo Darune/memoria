@@ -1,7 +1,7 @@
 import {
   Clip, MemoryClip, Memory, MemoryClipTransitionType, EffectType, Audio
 } from "~/data/model";
-import { getRandomInt } from '~/data/utils';
+import { getRandomInt } from "~/utils";
 import  genSettings, { AVAILABLE_FADE_INS, AVAILABLE_FADE_OUTS } from "./generation-settings";
 
 
