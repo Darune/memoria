@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { createSignal, onCleanup, onMount, Show } from "solid-js";
 import { MemoryType, EffectType } from "~/data/model";
 import VideoContext from 'videocontext';
 import KeyboardNav from "../keyboard-nav";
@@ -197,7 +197,7 @@ class EffectHandler {
 
 export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean, onEnded: CallableFunction, isEditing: boolean}) {
   const [thumbnail, setThumbnail] = createSignal<string>(null);
-  let effectHandler = null;
+  let effectHandler : EffectHandler | null = null;
 
   const applyEffect = (effectType) => {
     if (!effectHandler || !props.isEditing) {
@@ -205,9 +205,10 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
     }
     effectHandler.toggleEffect(effectType);
   }
+  let videoContext : any;
   onMount(() => {
     const canvasRef: HTMLCanvasElement = document.getElementById('video-canvas') as HTMLCanvasElement;
-    const videoContext = new VideoContext(canvasRef);
+    videoContext = new VideoContext(canvasRef);
     let globalOutput = buildPlaybackGraph(videoContext, props.memory);
     effectHandler = new EffectHandler(videoContext, globalOutput);
     globalOutput.connect(videoContext.destination);
@@ -239,6 +240,13 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
         props.onEnded(finalMemory);
       }
     );
+  });
+  onCleanup(()=> {
+    if (videoContext) {
+      videoContext.pause();
+      videoContext.reset();
+      videoContext = null;
+    }
   });
   return (
     <div>

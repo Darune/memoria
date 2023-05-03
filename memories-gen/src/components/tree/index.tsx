@@ -8,9 +8,9 @@ import { createRouteData, useRouteData } from 'solid-start';
 import Chip from '../chip/chip';
 
 
-function turnOffElements(indices, type='branch') {
+function turnOffElements(indices, type='branch', nodeType='div') {
   for (const previousIndex of indices) {
-    const elements = document.querySelectorAll(`.${type}-${previousIndex}`)
+    const elements = document.querySelectorAll(`${nodeType}.${type}-${previousIndex}`)
     for (const element of elements) {
       // element.classList.remove('active');
       element.classList.remove('dark:bg-cyan-50');
@@ -19,16 +19,52 @@ function turnOffElements(indices, type='branch') {
     }
   }
 }
-function lightUpElement(indices, previousIndices, type='branch') {
+function lightUpElement(indices, previousIndices, type='branch', nodeType='div') {
   turnOffElements(previousIndices, type);
   for (const index of indices) {
-    const elements = document.querySelectorAll(`.${type}-${index}`)
+    const elements = document.querySelectorAll(`${nodeType}.${type}-${index}`)
     for (const element of elements) {
       element.classList.add('dark:bg-cyan-50');
       element.classList.add('dark:text-slate-800');
       element.classList.add('dark:fill-cyan-50');
     }
   }
+}
+
+
+function getLightupCallback(selector: string, isReverse: boolean) : CallableFunction{
+  return () => {
+    const element = document.querySelector(selector);
+    element?.classList.remove(isReverse ? 'animate-flash' : 'animate-flash-2' );
+    element?.classList.add(isReverse ? 'animate-flash-2' : 'animate-flash');
+  }
+}
+
+function animateTree(
+  nbIteration: number, step: number, videoWords: Array<string>, soundWords: Array<string>,
+  reverse: boolean = false, nbTotal: number, currentIteration: number,
+  onEnded: CallableFunction
+) {
+  console.log('animateTree', reverse);
+  let currentIdx = 0;
+  while (currentIdx < nbIteration) {
+    const delay = reverse ? (nbIteration - currentIdx) * step : currentIdx * step
+    if (currentIdx < videoWords.length) {
+      setTimeout(getLightupCallback(`path.branch-${currentIdx}`, reverse), delay);
+    }
+    if (currentIdx < soundWords.length) {
+      setTimeout(getLightupCallback(`path.root-${currentIdx}`, reverse), delay);
+    }
+    currentIdx++;
+  }
+  if (currentIteration >= nbTotal) {
+    onEnded();
+    return;
+  }
+  setTimeout(() => animateTree(
+    nbIteration, step, videoWords, soundWords, !reverse,
+    nbTotal, currentIteration + 1, onEnded
+  ), (step * nbIteration) + 500);
 }
 
 export default function TreeAndWords(props: {
@@ -41,36 +77,49 @@ export default function TreeAndWords(props: {
   ) => {
     const { videoWords, soundWords } = props.words;
     const body = document.querySelector('.cls-1.body-tree');
-    body?.classList.remove('dark:fill-gray-400');
-    body?.classList.add('dark:fill-cyan-50');
-    // const selectedVideos = props.animateTowards?.clipNames.map((clipName) => {
-    //   const word = clipName.replace('.mp4', '').replaceAll('-', '').replaceAll('_', ' ');
-    //   return videoWords.indexOf(word);
-    // })
-    // const soundName = props.animateTowards.sound.replace('.mp3', '').replaceAll('-', '').replaceAll('_', ' ')
-    // const selectedAudio = soundWords.indexOf(soundName);
+    // body?.classList.remove('dark:fill-gray-400');
+    body?.classList.add('animate-flash-slow');
+    const selectedVideos = animationConfig.clipNames.map((clipName) => {
+      const word = clipName.replace('.mp4', '').replaceAll('-', '').replaceAll('_', ' ');
+      return videoWords.indexOf(word);
+    })
+
+    const soundName = animationConfig.sound.replace('.mp3', '').replaceAll('-', '').replaceAll('_', ' ')
+    const selectedAudio = soundWords.indexOf(soundName);
+
     let animatedBranches = fillWithRandom(videoWords.length - 1, settings.MAX_BRANCHE_ANIMATED);
     let animatedRoots = fillWithRandom(soundWords.length - 1, settings.MAX_ROOT_ANIMATED);
-    lightUpElement(animatedBranches, [], 'branch');
-    lightUpElement(animatedRoots, [], 'root');
-    const nbIteration = 8;
+
+    const nbIteration = Math.max(videoWords.length, soundWords.length );
+    const step = 300 / nbIteration;
     const intervalId = setInterval(() => {
       const newBranches = fillWithRandom(videoWords.length - 1, settings.MAX_BRANCHE_ANIMATED);
       const newRoots = fillWithRandom(soundWords.length - 1, settings.MAX_ROOT_ANIMATED);
       lightUpElement(newBranches, animatedBranches, 'branch');
       lightUpElement(newRoots, animatedRoots, 'root');
-      console.log(animatedRoots[0], newRoots[0]);
       animatedRoots = newRoots;
       animatedBranches = newBranches;
     }, (animationConfig.timeout - 500 )/ nbIteration)
-    setTimeout(() => {
-      clearInterval(intervalId);
-      // turnOffElements(animatedBranches, 'branch');
-      // turnOffElements(animatedRoots, 'root');
-      // lightUpElement(selectedVideos, animatedBranches, 'branch');
-      // lightUpElement(selectedAudio, animatedRoots, 'root');
-      props.onAnimateEnd();
-    }, animationConfig.timeout - 500);
+    animateTree(
+      nbIteration, step, videoWords, soundWords, false, 5, 0,
+      () => {
+        clearInterval(intervalId);
+        const elements = document.querySelectorAll('path.root, path.branch')
+        for (const element of elements) {
+          element.classList.remove('animate-flash');
+          element.classList.remove('animate-flash-2');
+        }
+        body?.classList.remove('animate-flash-slow');
+        lightUpElement(selectedVideos, animatedBranches, 'branch', 'div');
+        lightUpElement([selectedAudio], animatedRoots, 'root', 'div');
+        lightUpElement(selectedVideos, [], 'branch', 'path');
+        lightUpElement([selectedAudio], [], 'root', 'path');
+        setTimeout(() => {
+          props.onAnimateEnd();
+        }, 5000);
+      }
+    );
+
   };
 
   createEffect(() => {

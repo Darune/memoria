@@ -20,26 +20,29 @@ export function routeData() : any {
 export default function Home() {
   const fetchedData = useRouteData<typeof routeData>();
   const [ shouldEdit, setShouldEdit ] = createSignal(false);
+  const [ isAnimating, setIsAnimating ] = createSignal(false);
   const [ animateConfig, setAnimateConfig ] = createSignal<any>(null);
   const [ words, setWords ] = createSignal<any>(null);
   const navigate = useNavigate();
 
   const runGeneration = () => {
-    refetchRouteData();
+    if (!isAnimating()) {
+      refetchRouteData();
+      setIsAnimating(true);
+    }
   };
   createEffect(() => {
     if (fetchedData.state == 'refreshing') setShouldEdit(true);
     if (fetchedData.state !== 'ready') return;
     if (words() == null) {
       const { fwords } = fetchedData();
-      console.log('settingWords', {...fetchedData()});
       setWords(({...fetchedData().words}));
     }
     if (shouldEdit()) {
       const { memory } = fetchedData();
       setEditingMemory({...memory});
       setAnimateConfig({
-        climNames: memory.clips.map(
+        clipNames: memory.clips.map(
           (clip: ClipType) => clip.name
         ),
         sound: memory.audio?.name,
@@ -49,8 +52,8 @@ export default function Home() {
     }
   });
   const onTreeAnimateEnded = () => {
-    //navigate('/create');
-    console.log('done');
+    navigate('/create');
+    setIsAnimating(false);
   }
   return (
     <main class="h-screen flex justify-center flex-col">

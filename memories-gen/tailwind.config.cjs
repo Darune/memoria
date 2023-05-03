@@ -9,7 +9,23 @@ module.exports = {
     'dark:bg-cyan-50',
   ],
   theme: {
-    extend: {}
+    extend: {
+      keyframes: {
+        flash: {
+          '0%, 100%': { fill: '#9ca3af' },
+          '50%': { fill: '#ecfeff'}
+        },
+        'flash-2': {
+          '0%, 100%': { fill: '#9ca3af' },
+          '50%': { fill: '#ecfeff'}
+        },
+      },
+      animation: {
+        flash: 'flash 0.6s cubic-bezier(0.54, 0.79, 0, 1) 1',
+        'flash-2': 'flash-2 0.6s cubic-bezier(0.54, 0.79, 0, 1) 1',
+        'flash-slow': 'flash 3.0s linear infinite',
+      }
+    }
   },
   plugins: []
 };
