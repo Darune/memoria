@@ -1,18 +1,23 @@
-import { onMount, onCleanup, For, Show,  } from "solid-js";
+import { onMount, onCleanup, For, Show, createEffect,  } from "solid-js";
 import redButton from '~/assets/red.png';
 import greenButton from '~/assets/green.png';
 import blueButton from '~/assets/blue.png';
 import whiteButton from '~/assets/white.png';
+import squareButtom from '~/assets/square.png';
+import triangleButtom from '~/assets/triangle.png';
 import yellowButton from '~/assets/yellow.png';
 
 const noop = () => null;
 
 export default function(props: {
   onRedClicked?: CallableFunction, onGreenClicked?: CallableFunction,
-  onBlueClicked?: CallableFunction, onWhiteClicked?: CallableFunction,
-  onYellowClicked?: CallableFunction,
+  onBlueClicked?: CallableFunction, onYellowClicked?: CallableFunction,
+  onTriangleClicked?: CallableFunction, onSquareClicked?: CallableFunction,
   showHelp: boolean,
-  helpTexts: {red?: string, green?: string, blue?: string, white?: string, yellow?: string}
+  helpTexts: {
+    triangle?: string | Element, square?: string | Element,
+    red?: string | Element, green?: string | Element, blue?: string | Element, yellow?: string | Element,
+}
   availableColors: Array<string>,
 }) {
   const ColorsDefinition = [{
@@ -28,32 +33,46 @@ export default function(props: {
     name: 'blue',
     img: blueButton,
   }, {
-    action: props.onWhiteClicked || noop,
-    name: 'white',
-    img: whiteButton
-  }, {
     action: props.onYellowClicked || noop,
     name: 'yellow',
     img: yellowButton,
+  }, {
+    action: props.onTriangleClicked || noop,
+    name: 'triangle',
+    img: triangleButtom
+  }, {
+    action: props.onSquareClicked || noop,
+    name: 'square',
+    img: squareButtom
   }]
   const keyUp = (event: KeyboardEvent) => {
     switch (event.key) {
-      case 'e':
+      case 'h':
         (props.onRedClicked || noop)();
         break;
-      case 'c':
-          (props.onGreenClicked || noop)();
-          break;
+      case 'j':
+        (props.onGreenClicked || noop)();
+        break;
+      case 'k':
+        (props.onBlueClicked || noop)();
+        break;
+      case 'l':
+        (props.onYellowClicked || noop)();
+        break;
+      case 'u':
+        (props.onTriangleClicked || noop)();
+        break;
+      case 'i':
+        (props.onSquareClicked || noop)();
+        break;
       default:
         break;
     }
   };
 
-  onMount(() => {
+  createEffect(() => {
     document.addEventListener('keyup', keyUp);
-  })
-  onCleanup(() => {
-    document.removeEventListener('keyup', keyUp);
+    onCleanup(() => document.removeEventListener('keyup', keyUp));
   })
   if (!props.showHelp) {
     return null;

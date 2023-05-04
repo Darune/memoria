@@ -66,10 +66,10 @@ export default function Home() {
         />
       </div>
       <KeyboardNav
-        onRedClicked={() => {runGeneration();}}
-        onGreenClicked={() => {navigate('/archives')}}
-        helpTexts={{red: 'start', green: 'archives'}}
-        availableColors={['red', 'green']}
+        onTriangleClicked={() => {runGeneration();}}
+        onSquareClicked={() => {navigate('/archives')}}
+        helpTexts={{triangle: 'start', square: 'archives'}}
+        availableColors={['triangle', 'square']}
         showHelp
       />
     </main>

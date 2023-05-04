@@ -255,7 +255,8 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
         onGreenClicked={() => {applyEffect('colorbar');}}
         onBlueClicked={() => (null)}
         onYellowClicked={() => (null)}
-        onWhiteClicked={() => (null)}
+        onTriangleClicked={() => (null)}
+        onSquareClicked={() => (null)}
       />
       <canvas id="video-canvas" width="1000px" height="800px"></canvas>
       <Show when={props.debug}>
