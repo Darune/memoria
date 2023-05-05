@@ -1,10 +1,11 @@
-import { For, createEffect, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { useNavigate, useRouteData, createRouteData } from "solid-start";
-
+import Chip from "~/components/chip/chip";
 import ClientVideoPlayer from "~/components/video-player/client-player";
 import { editingMemory } from "~/stores/memory";
 import { MemoryType } from "~/data/model";
 import { client } from "~/lib/trpc-client";
+import { soundFileToWord, videoFileToWord } from "~/utils";
 
 
 export function routeData() {
@@ -21,12 +22,18 @@ export default function CreatePage() {
   //   if (data.state !== 'ready') return;
   // });
   return (
-    <div class="container mx-auto">
+    <div class="w-screen h-screen">
       <Show when={ data() } keyed>
         {(memory) => {
           return (
-            <div class="container mx-auto">
-              <div>
+            <div class="container mx-auto h-full flex flex-col">
+              <div class="flex flex-row gap-4 pb-5 pt-5 flex-wrap justify-evenly">
+                <For each={memory.clips}>
+                  {(clip) => (<Chip text={videoFileToWord(clip.name)} />)}
+                </For>
+                <Chip text={soundFileToWord(memory.audio.name)} />
+              </div>
+              <div class="flex flex-col flex-grow">
                 <ClientVideoPlayer
                   memory={memory}
                   debug={true}
@@ -36,14 +43,9 @@ export default function CreatePage() {
                     setTimeout(() => navigate("/archives"), 200);
                   }}/>
               </div>
-              <ul>
-                <For each={memory.clips}>
-                  {(clip) => (<li>{clip.uid}</ li>)}
-                </For>
-              </ul>
-              <div>
+              {/* <div>
                 duration: {memory.duration}, thumbnailTime: {memory.thumbnailTime}, music: {memory.audio?.name}
-              </div>
+              </div> */}
             </div>
           );
         }}

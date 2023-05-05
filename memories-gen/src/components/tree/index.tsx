@@ -1,10 +1,9 @@
 import { createEffect, For, onMount, Show } from 'solid-js';
 import Tree from '~/assets/tree.svg?component-solid';
 import { fillWithRandom } from "~/utils";
-import { client } from "~/lib/trpc-client";
 
+import { videoFileToWord, soundFileToWord } from '~/utils';
 import settings from './animation-settings';
-import { createRouteData, useRouteData } from 'solid-start';
 import Chip from '../chip/chip';
 
 
@@ -80,11 +79,11 @@ export default function TreeAndWords(props: {
     // body?.classList.remove('dark:fill-gray-400');
     body?.classList.add('animate-flash-slow');
     const selectedVideos = animationConfig.clipNames.map((clipName) => {
-      const word = clipName.replace('.mp4', '').replaceAll('-', '').replaceAll('_', ' ');
+      const word = videoFileToWord(clipName);
       return videoWords.indexOf(word);
     })
 
-    const soundName = animationConfig.sound.replace('.mp3', '').replaceAll('-', '').replaceAll('_', ' ')
+    const soundName = soundFileToWord(animationConfig.sound)
     const selectedAudio = soundWords.indexOf(soundName);
 
     let animatedBranches = fillWithRandom(videoWords.length - 1, settings.MAX_BRANCHE_ANIMATED);

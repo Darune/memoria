@@ -10,6 +10,17 @@ module.exports = {
   ],
   theme: {
     extend: {
+      height: {
+        '4/3-canvas-edit': 'min(100%, calc((100vw * 3 / 4)));',
+        thumbnail: '156px',
+      },
+      width: {
+        '4/3-canvas-edit': 'min(100%, calc((100vh * 4 / 4)));',
+        thumbnail: '208px',
+      },
+      aspectRatio: {
+        '4/3': '4 / 3',
+      },
       keyframes: {
         flash: {
           '0%, 100%': { fill: '#9ca3af' },

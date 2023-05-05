@@ -13,3 +13,11 @@ export function fillWithRandom(max: number, iteration: number) : number[] {
   }
   return randomNumbers;
 }
+
+export function videoFileToWord(videoFile: string): string {
+  return videoFile.replace('.mp4', '').replaceAll('-', '').replaceAll('_', ' ');
+}
+
+export function soundFileToWord(soundFile: string): string {
+  return soundFile.replace('.mp3', '').replaceAll('-', '').replaceAll('_', ' ');
+}

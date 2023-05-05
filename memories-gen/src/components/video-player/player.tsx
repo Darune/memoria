@@ -1,6 +1,7 @@
 import { createSignal, onCleanup, onMount, Show } from "solid-js";
 import { MemoryType, EffectType } from "~/data/model";
 import VideoContext from 'videocontext';
+import Tree from '~/assets/tree.svg?component-solid';
 import KeyboardNav from "../keyboard-nav";
 import { Combine } from "./compositor/combine";
 import getTransitionNode from "./transitions";
@@ -16,7 +17,7 @@ function InitVisualisations(videoCtx, graphCanvasID, visualisationCanvasID){
         * Create an interactive visualisation canvas.
         */
         var visualisationCanvas = document.getElementById(visualisationCanvasID);
-		RefreshGraph(videoCtx, graphCanvasID);
+		    //RefreshGraph(videoCtx, graphCanvasID);
 
 
         //visualisationCanvas.height = 20;
@@ -206,17 +207,22 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
       return
     }
     effectHandler.toggleEffect(effectType);
-    RefreshGraph(videoContext, 'graph-canvas');
+    // RefreshGraph(videoContext, 'graph-canvas');
   }
   let videoContext : any;
   onMount(() => {
     const canvasRef: HTMLCanvasElement = document.getElementById('video-canvas') as HTMLCanvasElement;
+    const canvasThumbnail: HTMLCanvasElement = document.getElementById('thumbnail-preview') as HTMLCanvasElement;
+    canvasRef.width = canvasRef.clientWidth + 100 * 4/3;
+    canvasRef.height = canvasRef.clientHeight - 100;
     videoContext = new VideoContext(canvasRef);
     let globalOutput = buildPlaybackGraph(videoContext, props.memory);
     effectHandler = new EffectHandler(videoContext, globalOutput);
     globalOutput.connect(videoContext.destination);
     videoContext.play();
     if (props.debug) {
+      const timeLineCanvas: HTMLCanvasElement = document.getElementById('visualisation-canvas') as HTMLCanvasElement;
+      timeLineCanvas.width = canvasRef.clientWidth;
       InitVisualisations(videoContext, 'graph-canvas', 'visualisation-canvas');
     }
 
@@ -225,8 +231,11 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
 
     if (props.isEditing) {
       videoContext.registerTimelineCallback(props.memory.thumbnailTime, () => {
-        var img = canvasRef.toDataURL("image/png", 1.0);
+        var resizedContext = canvasThumbnail.getContext("2d");
+        resizedContext?.drawImage(canvasRef, 0, 0, 208, 156);
+        var img = canvasThumbnail.toDataURL("image/png", 1.0);
         setThumbnail(img);
+        canvasThumbnail.classList.remove('hidden');
       });
     } else if (props.memory.effectsTimeline) {
       effectHandler.replayEffectTimeline(props.memory.effectsTimeline);
@@ -251,30 +260,42 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
       videoContext = null;
     }
   });
+  let helpText = {
+    red: 'echo',
+    green: 'colorbar',
+    blue: 'CRT',
+    yellow: 'B&W',
+    square: (<Tree width={36} height={36}/>)
+  }
+  let availableColors = ['red', 'green', 'blue', 'yellow', 'square']
+  if (!props.isEditing) {
+    helpText['square'] = 'Archives'
+    availableColors = ['square']
+  }
   return (
-    <div>
+    <div class="flex flex-grow flex-col w-full items-center">
+      <canvas id="video-canvas" class="w-4/3-canvas-edit h-4/3-canvas-edit aspect-4/3-canvas w-full" ></canvas>
+      <Show when={props.debug}>
+        <div class="pt-5">
+          <canvas id="visualisation-canvas" height={50}></canvas>
+        </div>
+      </Show>
       <KeyboardNav
         onRedClicked={() => {applyEffect('echo');}}
         onGreenClicked={() => {applyEffect('colorbar');}}
         onBlueClicked={() => {applyEffect('crt');}}
         onYellowClicked={() => {applyEffect('monochrome');}}
         onTriangleClicked={() => (null)}
-        onSquareClicked={() => {navigate('/');}}
+        onSquareClicked={() => {if (props.isEditing) navigate('/'); else props.onEnded();}}
+        helpTexts={helpText}
+        availableColors={availableColors}
+        showHelp
       />
-      <canvas id="video-canvas" width="1000px" height="800px"></canvas>
-      <Show when={props.debug}>
-        <div>
-          <canvas id="visualisation-canvas" width="1000px" height="120"></canvas>
-        </div>
-        <div>
-          <canvas id="graph-canvas" width="1000px" height="360"></canvas>
-        </div>
-        <div>
-          <Show when={thumbnail()}>
-            <img width={256} height={256} src={thumbnail()} />
-          </Show>
-        </div>
-      </Show>
+      <div class="absolute right-20 bottom-20">
+        <canvas id="thumbnail-preview" class="h-thumbnail w-thumbnail hidden" width={208} height={156} />
+          {/* <img width={128} height={128} src={thumbnail()} /> */}
+      </div>
+      {/* <canvas class="hidden" id="thumnail-canvas" /> */}
     </div>
   );
 }

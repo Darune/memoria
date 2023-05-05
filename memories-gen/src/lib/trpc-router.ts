@@ -4,6 +4,7 @@ import { getAllClips, getAllMusics, archiveMemory, getAllMemories, getMemory, ge
 import generate from "~/generator/generate";
 import { memoryTypeSchema } from "~/data/zod-schema";
 import { MemoryType } from '~/data/model';
+import { videoFileToWord, soundFileToWord } from '~/utils';
 
 const t = initTRPC.create();
 
@@ -30,8 +31,8 @@ export const appRouter = t.router({
   getWords: t.procedure.query(() => {
     const rowWords = getWords();
     return {
-      soundWords: rowWords.soundWords.map((w) => w.replace('.mp3', '').replaceAll('-', '').replaceAll('_', ' ')),
-      videoWords: rowWords.videoWords.map((w) => w.replace('.mp4', '').replaceAll('-', '').replaceAll('_', ' ')),
+      soundWords: rowWords.soundWords.map(soundFileToWord),
+      videoWords: rowWords.videoWords.map(videoFileToWord),
     }
   })
 });
