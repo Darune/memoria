@@ -2,6 +2,9 @@ import { EffectType } from "~/data/model";
 import { default as fadeDenifinition, OPERAND_TYPE_MULT,  OPERAND_TYPE_DIVIDE } from './fade/fade';
 import { default as echoDefinition } from './echo/echo';
 import { default as colorbarDefinition } from './colorbar/colorbar';
+import { default as crtDefinition } from './crt/crt';
+import VideoContext from 'videocontext';
+
 
 function fadeTransitionNode(definition, transitionParameter, operand) {
   return (videoContext, start, stop) => {
@@ -27,6 +30,8 @@ const effects = {
   'fade_norm_to_black': fadeTransitionNode(fadeDenifinition, {from: 1.0, to: 0.0}, OPERAND_TYPE_MULT),
   'echo': basicEffectNode(echoDefinition),
   'colorbar': basicEffectNode(colorbarDefinition),
+  'crt': basicEffectNode(crtDefinition),
+  'monochrome': basicEffectNode(VideoContext.DEFINITIONS.MONOCHROME)
 };
 
 export default function getEffectNode(videoContext, EffectDefinition: EffectType) {

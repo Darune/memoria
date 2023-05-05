@@ -5,6 +5,7 @@ import KeyboardNav from "../keyboard-nav";
 import { Combine } from "./compositor/combine";
 import getTransitionNode from "./transitions";
 import getEffectNode from "./effects";
+import { useNavigate } from "solid-start";
 
 
 function InitVisualisations(videoCtx, graphCanvasID, visualisationCanvasID){
@@ -22,7 +23,7 @@ function InitVisualisations(videoCtx, graphCanvasID, visualisationCanvasID){
         //visualisationCanvas.width = 390;
         //Setup up a render function so we can update the playhead position.
         function render () {
-            //VideoCompositor.renderPlaylist(playlist, visualisationCanvas, videoCompositor.currentTime);
+            // VideoCompositor.renderPlaylist(playlist, visualisationCanvas, videoCompositor.currentTime);
             VideoContext.visualiseVideoContextTimeline(videoCtx, visualisationCanvas, videoCtx.currentTime);
             requestAnimationFrame(render);
         }
@@ -101,7 +102,7 @@ function buildPlaybackGraph(videoContext, memory: MemoryType) {
 }
 
 const AVAILABLE_INTERACTIVE_EFFECTS = [
-  'echo', 'colorbar'
+  'echo', 'colorbar', 'crt', 'monochrome',
 ];
 
 
@@ -128,7 +129,7 @@ class EffectHandler {
   activateEffect(effectType: string) {
     const nbEffects = this.effectStack.length;
     let previousNode = this.rootNode
-    if (nbEffects == 1) {
+    if (nbEffects > 0) {
       previousNode = this.effectsNodes[this.effectStack[nbEffects - 1]];
     }
     previousNode.disconnect()
@@ -196,6 +197,7 @@ class EffectHandler {
 }
 
 export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean, onEnded: CallableFunction, isEditing: boolean}) {
+  const navigate = useNavigate();
   const [thumbnail, setThumbnail] = createSignal<string>(null);
   let effectHandler : EffectHandler | null = null;
 
@@ -204,6 +206,7 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
       return
     }
     effectHandler.toggleEffect(effectType);
+    RefreshGraph(videoContext, 'graph-canvas');
   }
   let videoContext : any;
   onMount(() => {
@@ -253,10 +256,10 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
       <KeyboardNav
         onRedClicked={() => {applyEffect('echo');}}
         onGreenClicked={() => {applyEffect('colorbar');}}
-        onBlueClicked={() => (null)}
-        onYellowClicked={() => (null)}
+        onBlueClicked={() => {applyEffect('crt');}}
+        onYellowClicked={() => {applyEffect('monochrome');}}
         onTriangleClicked={() => (null)}
-        onSquareClicked={() => (null)}
+        onSquareClicked={() => {navigate('/');}}
       />
       <canvas id="video-canvas" width="1000px" height="800px"></canvas>
       <Show when={props.debug}>
