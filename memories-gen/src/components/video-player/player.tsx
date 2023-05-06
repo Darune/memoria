@@ -265,15 +265,14 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
     green: 'colorbar',
     blue: 'CRT',
     yellow: 'B&W',
-    square: (<Tree width={36} height={36}/>)
   }
-  let availableColors = ['red', 'green', 'blue', 'yellow', 'square']
+  let availableColors = ['red', 'green', 'blue', 'yellow']
   if (!props.isEditing) {
     helpText['square'] = 'Archives'
     availableColors = ['square']
   }
   return (
-    <div class="flex flex-grow flex-col w-full items-center">
+    <div class="flex flex-grow flex-col w-full items-centera">
       <canvas id="video-canvas" class="w-4/3-canvas-edit h-4/3-canvas-edit aspect-4/3-canvas w-full" ></canvas>
       <Show when={props.debug}>
         <div class="pt-5">
