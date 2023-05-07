@@ -1,0 +1,11 @@
+{
+    "keyboard": "ez_maker/directpins/promicro",
+    "keymap": "default",
+    "layout": "LAYOUT",
+    "layers": [
+        [
+            "KC_U", "KC_I",
+            "KC_H", "KC_J", "KC_K", "KC_L"
+        ]
+    ]
+}

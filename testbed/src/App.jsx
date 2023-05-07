@@ -1,70 +1,93 @@
 import logo from './logo.svg';
 import styles from './App.module.css';
-import VideoContext from 'videocontext';
 import { createSignal, createEffect, onMount  } from 'solid-js';
-import gangman from './assets/gangnam.mp4';
-import bigbuck from './assets/bigbuck.mp4';
 
-var combineDecription ={
-  title:"Combine",
-  description: "A basic effect which renders the input to the output, Typically used as a combine node for layering up media with alpha transparency.",
-  vertexShader : `
-    attribute vec2 a_position;
-    attribute vec2 a_texCoord;
-    varying vec2 v_texCoord;
-    void main() {
-      gl_Position = vec4(vec2(2.0,2.0)*a_position-vec2(1.0, 1.0), 0.0, 1.0);
-      v_texCoord = a_texCoord;
-    }`,
-  fragmentShader : `
-    precision mediump float;
-    uniform sampler2D u_image;
-    varying vec2 v_texCoord;
-    varying float v_mix;
-    void main(){
-      vec4 color = texture2D(u_image, v_texCoord);
-      gl_FragColor = color;
-    }`,
-  properties:{
-  },
-  inputs:["u_image"]
-};
+async function getOpenedDevice() {
+  const devices = await navigator.hid.getDevices();
+  console.log(devices.find(d => d.vendorId === 0xFEED && d.productId === 0x2320&& d.usage==0x61 && d.usagePage==0xFF60));
+  let device = devices.find(d => d.vendorId === 0xFEED && d.productId === 0x2320&& d.collections && d.collections.length && d.collections[0].usage==0x61);
+
+  if (!device) {
+    device = await navigator.hid.requestDevice({
+      filters: [{ vendorId: 0xFEED, productId: 0x2320 , usage: 0x61, usagePage: 0xFF60}],
+    });
+    device = device[0];
+  }
+
+  if (!device.opened) {
+    await device.open();
+    device.addEventListener("inputreport", (event) => {
+      const { data, device, reportId } = event;
+
+      console.log(data, device, reportId);
+    });
+  }
+  let reportId = 0;
+  // Create the report buffer.
+  // let reportData = new Uint8Array([0, 1]);
+  // await device.sendReport(0, reportData);
+  // console.log(device);
+  return device;
+}
+
+async function turnLed(ledNum, state) {
+  const device = await getOpenedDevice();
+  let reportData = new Uint8Array([1, ledNum, state]);
+  await device.sendReport(0, reportData);
+}
+
+async function resetLeds() {
+  const device = await getOpenedDevice();
+  let reportData = new Uint8Array([0, 0]);
+  await device.sendReport(0, reportData);
+}
 
 function App() {
   const [playPause, setPlayPause] = createSignal(false);
+  const [ledNumber, setLedNumber] = createSignal(0);
   let videoContext;
-  onMount(() => {
-    const canvasRef = document.getElementById('canvas');
-    videoContext = new VideoContext(canvasRef);
-    var videoNode1 = videoContext.video(gangman, 0, 100, { volume: 0, loop: true });
-    var videoNode2 = videoContext.video(bigbuck, 0, 100, { volume: 0, loop: true });
+  onMount(async () => {
+    // let deviceFilter = { vendorId: 0xFEED, productId: 0x2320};
+    // let requestParams = { filters: [deviceFilter] };
+    // let outputReportId = 0x01;
+    // let outputReport = new Uint8Array([42]);
 
-    videoNode1.startAt(0);
-    videoNode1.stopAt(10);
-    videoNode2.startAt(0);
-    videoNode2.stopAt(10);
-    var combineEffect = videoContext.effect(combineDecription);
-    videoNode1.connect(combineEffect);
-    videoNode2.connect(combineEffect);
-    combineEffect.connect(videoContext.destination);
-    combineEffect.transition(3, 8, 0.0, 1.0);
-  });
+    // function handleConnectedDevice(e) {
+    //   console.log("Device connected: " + e.device.productName);
+    // }
 
-  createEffect((prev) => {
-    if (playPause()) {
-      videoContext.play();
-    } else {
-      videoContext.pause();
-    }
+    // function handleDisconnectedDevice(e) {
+    //   console.log("Device disconnected: " + e.device.productName);
+    // }
+
+    // function handleInputReport(e) {
+    //   console.log(e.device.productName + ": got input report " + e.reportId);
+    //   console.log(new Uint8Array(e.data.buffer));
+    // }
+
+    // navigator.hid.addEventListener("connect", handleConnectedDevice);
+    // navigator.hid.addEventListener("disconnect", handleDisconnectedDevice);
+    // const device = await getOpenedDevice();
+    // console.log(device);
+    // navigator.hid.requestDevice(requestParams).then((devices) => {
+    //   if (devices.length == 0) return;
+    //   devices[0].open().then(() => {
+    //     console.log("Opened device: " + device.productName);
+    //     device.addEventListener("inputreport", handleInputReport);
+    //     device.sendReport(outputReportId, outputReport).then(() => {
+    //       console.log("Sent output report " + outputReportId);
+    //     });
+    //   });
+    // });
   });
   // Working only with volume = 0
-  setTimeout(() => setPlayPause(true), 10);
   return (
     <div class={styles.App}>
-      <canvas id="canvas" width="1280" height="720" style="width: 852px; height: 480px"></canvas>
-      <div>
-        <button onClick={() => setPlayPause(!playPause())}>{playPause() ? "pause" : "play"}</button>
-      </div>
+      <input type="number" value={ledNumber()} onChange={(e) => setLedNumber(parseInt(e.target.value))}></input>
+      <button onClick={async () => await getOpenedDevice()}> Pair </button>
+      <button onClick={async () => turnLed(ledNumber(), 1)}> Turn on </button>
+      <button onClick={async () => turnLed(ledNumber(), 0)}> Turn off </button>
+      <button onClick={async () => resetLeds()}> Reset </button>
       {/* <img src={logo} class={styles.logo} alt="logo" /> */}
     </div>
 

@@ -24,3 +24,7 @@ package = "sqlite"
 name = "sqlite3"
 help = "sqlite"
 
+[[commands]]
+package = "qmk"
+name = "QMK CLI"
+help = "qmk"
