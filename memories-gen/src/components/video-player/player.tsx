@@ -7,7 +7,7 @@ import { Combine } from "./compositor/combine";
 import getTransitionNode from "./transitions";
 import getEffectNode from "./effects";
 import { useNavigate } from "solid-start";
-
+import { turnLed, resetLeds } from "~/lib/keyboard";
 
 function InitVisualisations(videoCtx, graphCanvasID, visualisationCanvasID){
 	/****************************
@@ -113,14 +113,19 @@ class EffectHandler {
   effectStack : Array<string>;
   effectsTimeline : Array<EffectType>;
   effectsDefinitions : Record<string, EffectType>;
+  effectToLedIdx : Record<string, number>;
   rootNode: any;
 
   constructor(videoContext: any, rootNode: any) {
     this.videoContext = videoContext
     this.rootNode = rootNode
     this.effectsNodes = {};
+    this.effectToLedIdx = {};
+    let ledIdx = 0;
     for (const effectType of AVAILABLE_INTERACTIVE_EFFECTS) {
       this.effectsNodes[effectType] = getEffectNode(videoContext, {type: effectType, start: 0});
+      this.effectToLedIdx[effectType] = ledIdx;
+      ledIdx++;
     }
     this.effectStack = [];
     this.effectsTimeline = [];
@@ -142,6 +147,7 @@ class EffectHandler {
       start: this.videoContext.currentTime,
     }
     this.effectsTimeline.push(this.effectsDefinitions[effectType])
+    turnLed(this.effectToLedIdx[effectType], true);
   }
 
   deactivateEffect(effectType: string) {
@@ -168,6 +174,7 @@ class EffectHandler {
     this.effectStack.splice(effectIdx, 1);
     this.effectsDefinitions[effectType].stop = this.videoContext.currentTime
     delete this.effectsDefinitions[effectType];
+    turnLed(this.effectToLedIdx[effectType], false);
   }
 
   toggleEffect(effectType: string) {
@@ -219,6 +226,7 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
     let globalOutput = buildPlaybackGraph(videoContext, props.memory);
     effectHandler = new EffectHandler(videoContext, globalOutput);
     globalOutput.connect(videoContext.destination);
+    resetLeds();
     videoContext.play();
     if (props.debug) {
       const timeLineCanvas: HTMLCanvasElement = document.getElementById('visualisation-canvas') as HTMLCanvasElement;
@@ -249,6 +257,7 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
           effectsTimeline: effectHandler.getEffectsTimeLine(),
           thumbnailImage: thumbnail(),
         }
+        resetLeds();
         props.onEnded(finalMemory);
       }
     );
@@ -258,6 +267,7 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
       videoContext.pause();
       videoContext.reset();
       videoContext = null;
+      resetLeds();
     }
   });
   let helpText = {
