@@ -3,7 +3,6 @@
     "keyboard_name": "memoria box",
     "maintainer": "darune",
     "development_board": "promicro",
-    "bootloader": "atmel-dfu",
     "processor": "atmega32u4",
     "features": {
         "bootmagic": true,

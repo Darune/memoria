@@ -1,2 +1,2 @@
 #define SERIAL_NUMBER "1337"
-#define COMBO_COUNT 1
+#define COMBO_COUNT 2
