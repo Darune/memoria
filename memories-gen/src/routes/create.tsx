@@ -38,9 +38,9 @@ export default function CreatePage() {
                   memory={memory}
                   debug={true}
                   isEditing={true}
-                  onEnded={(finalMemory: MemoryType) => {
-                    client.archiveMemory.mutate(finalMemory);
-                    setTimeout(() => navigate("/archives"), 200);
+                  onEnded={async (finalMemory: MemoryType) => {
+                    const archiveId = await client.archiveMemory.mutate(finalMemory);
+                    setTimeout(() => navigate(`/archives/${archiveId - 1}`), 300);
                   }}/>
               </div>
               {/* <div>

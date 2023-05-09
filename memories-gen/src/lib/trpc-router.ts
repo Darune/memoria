@@ -17,8 +17,7 @@ export const appRouter = t.router({
   archiveMemory: t.procedure.input(memoryTypeSchema).mutation(
     (opts) => {
       const { input: finalMemory } = opts
-      console.log(finalMemory);
-      archiveMemory(finalMemory as MemoryType);
+      return archiveMemory(finalMemory as MemoryType );
     }
   ),
   listMemories: t.procedure.query(() => {

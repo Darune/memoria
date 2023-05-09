@@ -83,7 +83,8 @@ export function archiveMemory(memory: MemoryType) {
   const id = db.prepare('INSERT into ArchivedMemories(memory, thumbnail) VALUES (?, ?)').run(
     JSON.stringify(memory), memory.thumbnailImage
   );
-  db.close();
+  // const id = db.prepare('SELECT last_insert_rowid()').run();
+  console.log(id);
   return id.lastInsertRowid;
 }
 

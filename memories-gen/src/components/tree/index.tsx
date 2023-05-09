@@ -44,7 +44,6 @@ function animateTree(
   reverse: boolean = false, nbTotal: number, currentIteration: number,
   onEnded: CallableFunction
 ) {
-  console.log('animateTree', reverse);
   let currentIdx = 0;
   while (currentIdx < nbIteration) {
     const delay = reverse ? (nbIteration - currentIdx) * step : currentIdx * step
