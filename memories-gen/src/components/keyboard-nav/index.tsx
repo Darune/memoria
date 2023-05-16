@@ -37,13 +37,13 @@ export default function(props: {
     name: 'yellow',
     img: yellowButton,
   }, {
-    action: props.onTriangleClicked || noop,
-    name: 'triangle',
-    img: triangleButtom
-  }, {
     action: props.onSquareClicked || noop,
     name: 'square',
     img: squareButtom
+  }, {
+    action: props.onTriangleClicked || noop,
+    name: 'triangle',
+    img: triangleButtom
   }]
   const keyUp = (event: KeyboardEvent) => {
     switch (event.key) {
