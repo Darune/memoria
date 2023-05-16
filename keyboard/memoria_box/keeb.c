@@ -14,7 +14,7 @@ const uint16_t PROGMEM refresh_combo[] = {KC_H, KC_J, KC_K, KC_L, COMBO_END};
 const uint16_t PROGMEM enter_combo[] = {KC_U, KC_I, COMBO_END};
 
 bool led_states[6] = {false, false, false, false, false, false};
-uint8_t led_pins[6] = {B6, B2, B3, B1, B4, B6};
+uint8_t led_pins[6] = {B6, B2, B3, B1, B4, B5};
 uint8_t letter_to_led_idx[6] = {KC_H, KC_J, KC_K, KC_L, KC_U, KC_I};
 
 combo_t key_combos[COMBO_COUNT] = {
