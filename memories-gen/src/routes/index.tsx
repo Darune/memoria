@@ -68,7 +68,7 @@ export default function Home() {
       <KeyboardNav
         onTriangleClicked={() => {runGeneration();}}
         onSquareClicked={() => {if (!isAnimating()) {navigate('/archives');}}}
-        helpTexts={{triangle: 'start', square: 'archives'}}
+        helpTexts={{triangle: 'Play', square: 'Spectres'}}
         availableColors={['triangle', 'square']}
         showHelp
       />

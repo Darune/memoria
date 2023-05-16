@@ -278,7 +278,7 @@ export default function MemoryPlayer(props: {memory: MemoryType, debug: boolean,
   }
   let availableColors = ['red', 'green', 'blue', 'yellow']
   if (!props.isEditing) {
-    helpText['square'] = 'Archives'
+    helpText['square'] = 'Spectres'
     availableColors = ['square']
   }
   return (
