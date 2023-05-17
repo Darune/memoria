@@ -10,6 +10,29 @@
     nixosConfigurations.pi = nixos.lib.nixosSystem {
       system = "aarch64-linux";
       modules = [
+        # ({...} : {
+        #   boot = {
+        #     extraModulePackages = [ ];
+        #     initrd = {
+        #       availableKernelModules = [ "xhci_pci" "usbhid" ];
+        #       kernelModules = [ ];
+        #     };
+        #     kernelPackages = pkgs.linuxPackages_rpi4;
+        #     loader = {
+        #       raspberryPi = {
+        #         enable = true;
+        #         uboot.enable = true;
+        #         version = 4;
+        #         firmwareConfig = ''
+        #           arm_freq=1200
+        #           dtparam=audio=on
+        #         '';
+        #       };
+        #       grub.enable = false;
+        #     };
+        #     tmpOnTmpfs = false;
+        #   };
+        # })
         ({ pkgs, ... }: {
             nixpkgs.overlays = [ (final: super: {
               makeModulesClosure = x:

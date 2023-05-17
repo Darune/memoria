@@ -3,7 +3,7 @@
     #!${pkgs.bash}/bin/bash
     # End all lines with '&' to not halt startup script execution
 
-    ${pkgs.chromium}/bin/chromium-browser --ignore-gpu-blocklist --ignore-gpu-blacklist --overlay-scrollbars --noerrdialogs --disable-notifications --disable-infobars --start-fullscreen --start-maximized --app="https://memories.juedan.net"
+    ${pkgs.chromium}/bin/chromium-browser --ignore-gpu-blocklist --ignore-gpu-blacklist --overlay-scrollbars --noerrdialogs --disable-notifications --disable-infobars --start-fullscreen --start-maximized --app="http://localhost:3000"
   '';
 
   inherit (pkgs) writeScript;
@@ -29,20 +29,43 @@ in{
     LC_TELEPHONE = "fr_FR.UTF-8";
     LC_TIME = "fr_FR.UTF-8";
   };
-
   # boot = {
+  #   extraModulePackages = [ ];
+  #   initrd = {
+  #     availableKernelModules = [ "xhci_pci" "usbhid" ];
+  #     kernelModules = [ ];
+  #   };
   #   kernelPackages = pkgs.linuxPackages_rpi4;
-  #   tmpOnTmpfs = true;
-  #   initrd.availableKernelModules = [ "usbhid" "usb_storage" ];
-  #   # ttyAMA0 is the serial console broken out to the GPIO
-  #   kernelParams = [
-  #       "8250.nr_uarts=1"
-  #       "console=ttyAMA0,115200"
-  #       "console=tty1"
-  #       # A lot GUI programs need this, nearly all wayland applications
-  #       "cma=1M"
-  #   ];
+  #   loader = {
+  #     raspberryPi = {
+  #       enable = true;
+  #       version = 4;
+  #       firmwareConfig = ''
+  #         arm_freq=1200
+  #         dtparam=audio=on
+  #       '';
+  #     };
+  #   };
   # };
+
+  boot = {
+    kernelPackages = pkgs.linuxPackages_rpi4;
+    initrd.availableKernelModules = [ "usbhid" "usb_storage" ];
+    # ttyAMA0 is the serial console broken out to the GPIO
+    # kernelParams = [
+    #     "8250.nr_uarts=1"
+    #     "console=ttyAMA0,115200"
+    #     "console=tty1"
+    #     # A lot GUI programs need this, nearly all wayland applications
+    #     "cma=1M"
+    # ];
+    loader.raspberryPi.firmwareConfig = ''
+      over_voltage=6
+      arm_freq=2000
+      gpu_freq=750
+      dtparam=audio=on
+    '';
+  };
 
   hardware.enableRedistributableFirmware = true;
 
@@ -55,7 +78,7 @@ in{
   # permission on hid raw
   # KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
   services.udev.extraRules = ''
-    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", TAG+="uaccess", TAG+="udev-acl"
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     ACTION=="add", SUBSYSTEM=="drm", KERNEL=="card0", TAG+="systemd"
   '';
   users.users.memoria = {
@@ -121,22 +144,47 @@ in{
     })
   ];
 
+  system.activationScripts.makeVaultWardenDir = lib.stringAfter [ "var" ] ''
+    mkdir -p /opt/videos
+    chmod 777 /opt/videos
+    mkdir -p /opt/sounds
+    chmod 777 /opt/sounds
+    mkdir -p /opt/db
+    chmod 777 /opt/db
+  '';
+
+  virtualisation = {
+    podman = {
+      enable = true;
+      dockerCompat = true;
+    };
+    oci-containers = {
+      backend = "podman";
+      containers.memoria = {
+        image = "docker.io/darune/memoria:latest";
+        autoStart = true;
+        ports = [ "3000:3000" ]; #server locahost : docker localhost
+        environment = {
+          VIDEO_FOLDER = "/src_videos/";
+          MUSIC_FOLDER = "/src_sounds/";
+        };
+        volumes = [
+          "/opt/videos:/src_videos/:ro"
+          "/opt/sounds:/src_sounds/:ro"
+          "/opt/db:/usr/src/app/db/:rw"
+        ];
+      };
+    };
+  };
+
   # By defining the script source outside of the overlay, we don't have to
   # rebuild the package every time we change the startup script.
   environment.etc."openbox/autostart".source = writeScript "autostart" autostart;
-  # http://memories.juedan.net\"
-  # systemd.enableEmergencyMode = false;
-  # systemd.services."serial-getty@ttyS0".enable = false;
-  # systemd.services."serial-getty@hvc0".enable = false;
-  # systemd.services."getty@tty1".enable = false;
-  # systemd.services."autovt@".enable = false;
 
-  # services.udisks2.enable = false;
-  # documentation.enable = false;
-  # powerManagement.enable = false;
 
   hardware.opengl.enable = true;
   hardware.raspberry-pi."4".fkms-3d.enable = true;
+  hardware.raspberry-pi."4".audio.enable = true;
 
   sdImage.compressImage = false;
   system.stateVersion = "23.05";
