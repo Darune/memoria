@@ -81,6 +81,7 @@ in{
     KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     ACTION=="add", SUBSYSTEM=="drm", KERNEL=="card0", TAG+="systemd"
   '';
+  services.unclutter.enable = true;
   users.users.memoria = {
     isNormalUser = true;
     description = "memoria";
