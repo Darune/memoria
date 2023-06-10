@@ -39,3 +39,11 @@ To run them, simply start:
 ```sh
 npm test
 ```
+
+## Building docker image
+
+```
+docker buildx create --use --platform linux/amd64,linux/arm64
+
+docker buildx build --platform linux/arm64,linux/amd64 -t darune/memoria:latest --push .
+```
