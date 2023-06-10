@@ -97,7 +97,7 @@ export function getAllMemories() : Array<{id: string, name: string}> {
   for (const row of rows) {
     memories.push({
       id: row.id,
-      name: `cecilia ${row.id}`
+      name: `cecilia ${row.id + 1}`
     })
   }
   db.close();
