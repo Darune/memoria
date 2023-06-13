@@ -2,7 +2,12 @@
   autostart = ''
     #!${pkgs.bash}/bin/bash
     # End all lines with '&' to not halt startup script execution
+    xset -dpms
+    setterm -blank 0 -powerdown 0
 
+    # turn off black Screensaver
+    xset s off
+    pactl set-default-sink 1
     ${pkgs.chromium}/bin/chromium-browser --ignore-gpu-blocklist --ignore-gpu-blacklist --overlay-scrollbars --noerrdialogs --disable-notifications --disable-infobars --start-fullscreen --start-maximized --app="http://localhost:3000"
   '';
 
@@ -12,6 +17,7 @@ in{
   hardware.bluetooth.enable = true;
   sound.enable = true;
   hardware.pulseaudio.enable = true;
+  hardware.pulseaudio.package = pkgs.pulseaudioFull;
   services.dbus.enable = true;
   time.timeZone = "Europe/Paris";
 
@@ -59,8 +65,11 @@ in{
     #     # A lot GUI programs need this, nearly all wayland applications
     #     "cma=1M"
     # ];
+    extraModprobeConfig = ''
+      options snd_bcm2835 enable_headphones=1
+    '';
     loader.raspberryPi.firmwareConfig = ''
-      over_voltage=6
+      over_voltage=7
       arm_freq=2000
       gpu_freq=750
       dtparam=audio=on
@@ -98,6 +107,7 @@ in{
   environment.systemPackages = with pkgs; [
     firefox
     chromium
+    pamixer
   ];
 
   services.openssh = {
@@ -190,7 +200,6 @@ in{
   hardware.opengl.enable = true;
   hardware.raspberry-pi."4".fkms-3d.enable = true;
   hardware.raspberry-pi."4".audio.enable = true;
-
   sdImage.compressImage = false;
   system.stateVersion = "23.05";
   nix.settings.trusted-users = [ "root" "memoria" ];
