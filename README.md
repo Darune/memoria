@@ -15,6 +15,6 @@ here is how it looked in the end:
 This project is separated in multiple folders: 
 
 - memories-gen: The web application that is displayed (contains an api and a frontend to generate, select, edit, view, archive short films)
-- 3d mockups : the editing box contains 6 buttons, those button allow navigation on the interface but also filters selection
+- 3d mockups : the editing box contains 6 buttons, those buttons allow navigation on the interface but also allow  filme filters selection
 - os: The operating system (for a raspberry pi 4) that will host all the part together, start a web browser to localhost
 - keyboard: A QMK custom keyboard firmware to be flashed on a promicro to handle the input by the user
